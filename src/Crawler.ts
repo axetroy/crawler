@@ -28,6 +28,14 @@ export interface Config {
   /**
    * Where to continue last crawl. Default: `false`
    */
+  /**
+   * The timeout of each request. Default: `1000 * 30` ms
+   */
+  timeout?: number;
+  /**
+   * The retry times of each request when fail. Default: `1`
+   */
+  retry?: number;
   persistence?: boolean;
   proxy?: ProxyProvider;
   agent?: AgentProvider;
@@ -37,21 +45,26 @@ export interface Config {
 }
 
 export class Crawler extends EventEmitter {
+  private _active = true;
   private _scheduling: Scheduling;
   constructor(private config: Config) {
     super();
-    const { concurrency, interval } = this.config;
+    const { concurrency, interval, timeout, retry } = this.config;
 
     const scheduling = new Scheduling(
-      concurrency || 1,
       async (task: Task<any>) => {
         const nextUrl = await this._next(task.data as string, "GET");
         if (interval > 0) {
           await sleep(interval);
         }
-        if (nextUrl) {
+        if (this._active && nextUrl) {
           scheduling.push({ name: nextUrl, data: nextUrl });
         }
+      },
+      {
+        concurrency,
+        timeout,
+        retry
       }
     );
 
@@ -120,6 +133,7 @@ export class Crawler extends EventEmitter {
    * stop crawl
    */
   stop() {
+    this._active = false;
     if (this._scheduling) {
       this._scheduling.clear();
     }

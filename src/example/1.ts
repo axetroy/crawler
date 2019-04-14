@@ -36,7 +36,7 @@ class BaiduProvider implements Provider {
   async next(lastResponse: AxiosResponse) {
     const url = new URL(lastResponse.config.url);
     const pageOffset = +url.searchParams.get("pn") || 0;
-    if (pageOffset < 1000) {
+    if (pageOffset < 200) {
       url.searchParams.delete("pn");
       url.searchParams.append("pn", pageOffset + 10 + "");
       return url.toString();
@@ -50,6 +50,7 @@ const spider = new Crawler({
   concurrency: 100,
   interval: 0,
   persistence: true,
+  retry: 5,
   provider: new BaiduProvider(),
   agent: new RandomUserAgentProvider(),
   logger: {

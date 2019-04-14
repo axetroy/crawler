@@ -1,7 +1,15 @@
+import * as retry from "p-retry";
+import * as timeout from "p-timeout";
 import { Persistence } from "./Persistence";
 export interface Task<T> {
   name: string;
   data?: T;
+}
+
+interface Options {
+  concurrency?: number;
+  timeout?: number;
+  retry?: number;
 }
 
 export class Scheduling {
@@ -11,9 +19,12 @@ export class Scheduling {
   private _runningQueue: Task<any>[] = [];
   private running: number;
   constructor(
-    public concurrency: number,
-    private cb: (task: Task<any>) => Promise<void>
+    private cb: (task: Task<any>) => Promise<void>,
+    private options: Options
   ) {
+    this.options.concurrency = this.options.concurrency || 1;
+    this.options.timeout = this.options.timeout || 1000 * 30;
+    this.options.retry = this.options.retry || 0;
     this._persistence = new Persistence();
   }
   private _syncPersistence() {
@@ -26,7 +37,7 @@ export class Scheduling {
     const queue = this._queue;
 
     // if queue is empty or is busy then return
-    if (!queue.length || this.running >= this.concurrency) return;
+    if (!queue.length || this.running >= this.options.concurrency) return;
     this.running = this.running + 1;
     const task = queue.shift();
 
@@ -34,13 +45,30 @@ export class Scheduling {
 
     this._syncPersistence();
 
-    this.cb(task).finally(() => {
-      this.running = this.running - 1;
-      // remove running task
-      const currentTaskIndex = this._runningQueue.findIndex(t => t === task);
-      this._runningQueue.splice(currentTaskIndex, 1);
-      this._syncPersistence();
+    // set timeout and retry
+    const timeoutAction = timeout(
+      this.cb(task),
+      this.options.timeout,
+      `request '${task.data}' timeout.`
+    );
+    const action = retry(() => timeoutAction, {
+      retries: this.options.retry,
+      onFailedAttempt(err) {
+        console.log(err.toString());
+      }
     });
+
+    action
+      .catch(() => {
+        // ignore error
+      })
+      .finally(() => {
+        this.running = this.running - 1;
+        // remove running task
+        const currentTaskIndex = this._runningQueue.findIndex(t => t === task);
+        this._runningQueue.splice(currentTaskIndex, 1);
+        this._syncPersistence();
+      });
   }
   public sync() {
     this._queue = this._persistence.sync();
