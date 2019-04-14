@@ -7,15 +7,15 @@ export interface Task<T> {
 export class Scheduling {
   public shouldPersistence: boolean;
   private _persistence: Persistence;
+  private _queue: Task<any>[] = [];
+  private _runningQueue: Task<any>[] = [];
+  private running: number;
   constructor(
     public concurrency: number,
     private cb: (task: Task<any>) => Promise<void>
   ) {
     this._persistence = new Persistence();
   }
-  private _queue: Task<any>[] = [];
-  private _runningQueue: Task<any>[] = [];
-  private running: number;
   private _syncPersistence() {
     if (this.shouldPersistence) {
       // update crawler file
@@ -37,10 +37,8 @@ export class Scheduling {
     this.cb(task).finally(() => {
       this.running = this.running - 1;
       // remove running task
-      this._runningQueue.splice(
-        this._runningQueue.findIndex(t => t === task),
-        1
-      );
+      const currentTaskIndex = this._runningQueue.findIndex(t => t === task);
+      this._runningQueue.splice(currentTaskIndex, 1);
       this._syncPersistence();
     });
   }
