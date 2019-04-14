@@ -9,7 +9,6 @@ import { HeaderProvider } from "./provider/Header";
 import { Provider } from "./provider/Provider";
 import { sleep } from "./utils";
 import { crawlerFilepath } from "./constant";
-const ua = require("modern-random-ua");
 
 const http = axios.create();
 
@@ -65,12 +64,10 @@ export class Crawler extends EventEmitter {
     const _proxy = proxy ? await proxy.resolve(url, method) : false;
 
     // resolve useragent
-    const userAgent = agent
-      ? agent.resolve(url, method)
-      : (ua.generate() as string);
+    const userAgent = agent ? await agent.resolve(url, method) : undefined;
 
     // resolve headers
-    const _headers = headers ? headers.resolve(url, method) : {};
+    const _headers = headers ? await headers.resolve(url, method) : {};
 
     // send request
     const response = await http.request({
@@ -78,7 +75,7 @@ export class Crawler extends EventEmitter {
       proxy: _proxy,
       headers: {
         ..._headers,
-        "User-Agent": userAgent
+        ...(userAgent ? { "User-Agent": userAgent } : {})
       }
     });
 

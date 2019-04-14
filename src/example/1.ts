@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import { URL } from "url";
 import { Crawler, Provider } from "../index";
+import { RandomUserAgentProvider } from "../build-in";
 import * as cheerio from "cheerio";
 
 class BaiduProvider implements Provider {
@@ -50,6 +51,7 @@ const spider = new Crawler({
   interval: 0,
   persistence: true,
   provider: new BaiduProvider(),
+  agent: new RandomUserAgentProvider(),
   logger: {
     log(msg) {
       console.log(msg);
