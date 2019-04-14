@@ -1,0 +1,34 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axetroy/crawler.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axetroy/crawler/issues"
+  },
+  "homepage": "https://github.com/axetroy/crawler#readme",
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/cheerio": "^0.22.11",
+    "@types/debug": "^4.1.4",
+    "@types/node": "^11.13.4",
+    "cheerio": "^1.0.0-rc.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.3"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "debug": "^4.1.1",
+    "modern-random-ua": "^1.0.3",
+    "p-map": "^2.1.0"
+  }
+}
