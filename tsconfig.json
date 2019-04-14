@@ -5,6 +5,8 @@
     "lib": ["es6", "dom"],
     "moduleResolution": "node",
     "sourceMap": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
     "typeRoots": ["node_modules/@types"],
     "experimentalDecorators": true
   },
