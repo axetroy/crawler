@@ -30,10 +30,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "debug": "^4.1.1",
     "fs-extra": "^7.0.1",
     "modern-random-ua": "^1.0.3",
-    "p-map": "^2.1.0",
     "p-retry": "^4.1.0",
     "p-timeout": "^3.1.0"
   }
