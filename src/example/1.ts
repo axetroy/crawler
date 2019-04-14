@@ -35,7 +35,7 @@ class BaiduProvider implements Provider {
   async next(lastResponse: AxiosResponse) {
     const url = new URL(lastResponse.config.url);
     const pageOffset = +url.searchParams.get("pn") || 0;
-    if (pageOffset < 10000) {
+    if (pageOffset < 1000) {
       url.searchParams.delete("pn");
       url.searchParams.append("pn", pageOffset + 10 + "");
       return url.toString();
@@ -46,8 +46,9 @@ class BaiduProvider implements Provider {
 }
 
 const spider = new Crawler({
-  concurrency: 5,
-  interval: 100,
+  concurrency: 100,
+  interval: 0,
+  persistence: true,
   provider: new BaiduProvider(),
   logger: {
     log(msg) {
@@ -57,7 +58,7 @@ const spider = new Crawler({
 });
 
 spider.on("data", data => {
-  console.log("收到数据", data);
+  // console.log("收到数据", data);
 });
 
 spider.start();

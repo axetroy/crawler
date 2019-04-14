@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import * as fs from "fs-extra";
 import axios from "axios";
 import { Task, Scheduling } from "./Scheduling";
 import { AgentProvider } from "./provider/Agent";
@@ -7,6 +8,7 @@ import { LoggerProvider } from "./provider/Logger";
 import { HeaderProvider } from "./provider/Header";
 import { Provider } from "./provider/Provider";
 import { sleep } from "./utils";
+import { crawlerFilepath } from "./constant";
 const ua = require("modern-random-ua");
 
 const http = axios.create();
@@ -24,6 +26,10 @@ export interface Config {
    * The interval between each loop. Default: `0`
    */
   interval?: number;
+  /**
+   * Where to continue last crawl. Default: `false`
+   */
+  persistence?: boolean;
   proxy?: ProxyProvider;
   agent?: AgentProvider;
   headers?: HeaderProvider;
@@ -35,12 +41,28 @@ export class Crawler extends EventEmitter {
   private _scheduling: Scheduling;
   constructor(private config: Config) {
     super();
+    const { concurrency, interval } = this.config;
+
+    const scheduling = new Scheduling(
+      concurrency || 1,
+      async (task: Task<any>) => {
+        const nextUrl = await this._next(task.data as string, "GET");
+        if (interval > 0) {
+          await sleep(interval);
+        }
+        if (nextUrl) {
+          scheduling.push({ name: nextUrl, data: nextUrl });
+        }
+      }
+    );
+
+    this._scheduling = scheduling;
   }
   private async _next(url: string, method: string): Promise<string> {
     const { provider, proxy, agent, logger, headers } = this.config;
 
     // resolve proxy
-    const _proxy = proxy ? (await proxy.resolve(url, method)) || false : false;
+    const _proxy = proxy ? await proxy.resolve(url, method) : false;
 
     // resolve useragent
     const userAgent = agent
@@ -80,24 +102,21 @@ export class Crawler extends EventEmitter {
    * start crawl
    */
   start() {
-    const { provider, interval } = this.config;
-    const concurrency = this.config.concurrency || 1;
-    const method = "GET";
+    const { provider, persistence } = this.config;
 
-    const scheduling = new Scheduling(concurrency, async (task: Task<any>) => {
-      const nextUrl = await this._next(task.data as string, method);
-      if (interval > 0) {
-        await sleep(interval);
-      }
-      if (nextUrl) {
-        scheduling.push({ name: nextUrl, data: nextUrl });
-      }
-    });
+    const crawlerPathExist = fs.pathExistsSync(crawlerFilepath);
 
-    this._scheduling = scheduling;
+    this._scheduling.shouldPersistence = persistence;
+
+    if (this._scheduling.shouldPersistence) {
+      if (crawlerPathExist) {
+        this._scheduling.sync();
+        return;
+      }
+    }
 
     for (const url of provider.urls) {
-      scheduling.push({ name: url, data: url });
+      this._scheduling.push({ name: url, data: url });
     }
   }
   /**
