@@ -7,7 +7,7 @@
 
 - [x] Access frequency limit
 - [x] Header header check
-- [ ] Breakpoint continued crawl
+- [x] Breakpoint continued crawl
 - [x] IP address proxy
 - [x] Headless mode
 
