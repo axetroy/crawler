@@ -1,10 +1,9 @@
-import { AxiosResponse } from "axios";
 import { URL } from "url";
-import { Crawler, Provider } from "../index";
+import { Crawler, Provider, Response } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
 import * as cheerio from "cheerio";
 
-class BaiduProvider implements Provider {
+class ZhihuProvider implements Provider {
   urls = [
     "https://www.baidu.com/s?wd=chrome",
     "https://www.baidu.com/s?wd=firefox",
@@ -17,7 +16,7 @@ class BaiduProvider implements Provider {
     "https://www.baidu.com/s?wd=soon"
   ];
   // 提取数据
-  async parse(response: AxiosResponse) {
+  async parse(response: Response) {
     const $ = cheerio.load(response.data);
     return {
       url: response.config.url,
@@ -33,7 +32,7 @@ class BaiduProvider implements Provider {
     };
   }
   // 是否应该进行下一页的数据爬取
-  async next(lastResponse: AxiosResponse) {
+  async next(lastResponse: Response) {
     const url = new URL(lastResponse.config.url);
     const pageOffset = +url.searchParams.get("pn") || 0;
     if (pageOffset < 200) {
@@ -51,7 +50,7 @@ const spider = new Crawler({
   interval: 0,
   persistence: true,
   retry: 5,
-  provider: new BaiduProvider(),
+  provider: new ZhihuProvider(),
   agent: new RandomUserAgentProvider(),
   logger: {
     log(msg) {
