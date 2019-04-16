@@ -54,13 +54,13 @@ const spider = new Crawler({
   agent: new RandomUserAgentProvider(),
   logger: {
     log(msg) {
-      console.log(msg);
+      // console.log(msg);
     }
   }
 });
 
 spider.on("data", data => {
-  // console.log("收到数据", data);
+  console.log("收到数据", data);
 });
 
 spider.start();

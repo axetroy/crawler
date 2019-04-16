@@ -26,9 +26,6 @@ export interface Config {
    */
   interval?: number;
   /**
-   * Where to continue last crawl. Default: `false`
-   */
-  /**
    * The timeout of each request. Default: `1000 * 30` ms
    */
   timeout?: number;

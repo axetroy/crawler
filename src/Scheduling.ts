@@ -33,18 +33,7 @@ export class Scheduling {
       this._persistence.sync(this._runningQueue);
     }
   }
-  private _next() {
-    const queue = this._queue;
-
-    // if queue is empty or is busy then return
-    if (!queue.length || this.running >= this.options.concurrency) return;
-    this.running = this.running + 1;
-    const task = queue.shift();
-
-    this._runningQueue.push(task);
-
-    this._syncPersistence();
-
+  private _exec(task: Task<any>): Promise<any> {
     // set timeout and retry
     const timeoutAction = timeout(
       this.cb(task),
@@ -58,7 +47,21 @@ export class Scheduling {
       }
     });
 
-    action
+    return action;
+  }
+  private _next() {
+    const queue = this._queue;
+
+    // if queue is empty or is busy then return
+    if (!queue.length || this.running >= this.options.concurrency) return;
+    this.running = this.running + 1;
+    const task = queue.shift();
+
+    this._runningQueue.push(task);
+
+    this._syncPersistence();
+
+    this._exec(task)
       .catch(() => {
         // ignore error
       })
