@@ -3,6 +3,10 @@
 
 ### crawler framework for nodejs
 
+This is a crawler framework for fast development.
+
+Currently still in development and any existing features may change.
+
 ### Featrue
 
 - [x] All is provider. eg. `Agent`/`Header`/`Proxy`
