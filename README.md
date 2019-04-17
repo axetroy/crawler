@@ -14,6 +14,10 @@
 
 ### Usage
 
+```bash
+npm install @axetroy/crawler
+```
+
 ```typescript
 import { Crawler, Provider, Response } from "@axetroy/crawler";
 
