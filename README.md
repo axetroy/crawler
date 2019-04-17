@@ -5,10 +5,12 @@
 
 ### Featrue
 
+- [x] All is provider. eg. `Agent`/`Header`/`Proxy`
 - [x] Access frequency limit
 - [x] Breakpoint continued crawl
 - [x] IP address proxy
 - [ ] Headless mode
+- [x] Build-in provider
 
 ### Usage
 
