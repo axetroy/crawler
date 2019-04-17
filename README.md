@@ -49,7 +49,7 @@ class MyProvider implements Provider {
       url.searchParams.append("page", page + 1 + "");
       return url.toString(); // return url to go next page
     } else {
-      return null;
+      return null; // return null mean there is no next page to got
     }
   }
 }
