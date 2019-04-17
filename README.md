@@ -69,9 +69,9 @@ spider.on("data", data => {
 spider.start();
 ```
 
-### example
+### Example
 
-here is the example [here](https://github.com/axetroy/crawler/tree/master/src/example)
+[here](https://github.com/axetroy/crawler/tree/master/src/example) is the examples.
 
 ### 捐赠我
 
