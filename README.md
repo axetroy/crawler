@@ -6,10 +6,69 @@
 ### Featrue
 
 - [x] Access frequency limit
-- [x] Header header check
 - [x] Breakpoint continued crawl
 - [x] IP address proxy
-- [x] Headless mode
+- [ ] Headless mode
+
+### Usage
+
+```typescript
+import { Crawler, Provider, Response } from "@axetroy/crawler";
+
+class MyProvider implements Provider {
+  urls = ["https://example/cate/1"];
+  // defined how to parse data
+  async parse(respone: Response) {
+    const $ = cheerio.load(response.data);
+    return {
+      url: response.config.url,
+      items: $(".item_title a")
+        .map((i, el) => {
+          return {
+            title: $(el).text(),
+            href: $(el).attr("href")
+          };
+        })
+        .get()
+    };
+  }
+  // Should crawler get data from next page?
+  async next(response: Response) {
+    const url = new URL(response.config.url);
+    const $ = cheerio.load(response.data);
+    // 当前第 n 页
+    const page = $(".page_current")
+      .eq(0)
+      .text()
+      .trim();
+
+    // get 20 pages data
+    if (+page < 20) {
+      url.searchParams.delete("page");
+      url.searchParams.append("page", page + 1 + "");
+      return url.toString(); // return url to go next page
+    } else {
+      return null;
+    }
+  }
+}
+
+const spider = new Crawler({
+  provider: MyProvider
+});
+
+spider.on("data", data => {
+  // here is the data you got.
+  console.log(data);
+});
+
+// start
+spider.start();
+```
+
+### example
+
+here is the example [here](https://github.com/axetroy/crawler/tree/master/src/example)
 
 ### 捐赠我
 
