@@ -42,7 +42,7 @@ export interface Config {
    */
   headers?: Headers;
   /**
-   * The logger provider/
+   * The logger provider.
    */
   logger?: Logger;
   /**

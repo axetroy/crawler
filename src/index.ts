@@ -5,6 +5,6 @@ export * from "./provider/Proxy";
 export * from "./provider/Agent";
 export * from "./provider/Logger";
 export * from "./provider/Header";
-export * from "./Scheduling";
+export * from "./_Scheduling";
 
 export type Response = AxiosResponse;

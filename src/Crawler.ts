@@ -1,11 +1,14 @@
 import { EventEmitter } from "events";
 import * as fs from "fs-extra";
 import axios from "axios";
-import { Task, Scheduling } from "./Scheduling";
-import { sleep } from "./utils";
-import { crawlerFilepath } from "./constant";
+import { Task, Scheduling } from "./_Scheduling";
+import { sleep } from "./_utils";
+import { crawlerFilepath } from "./_constant";
 import { Config } from "./Config";
 
+/**
+ * @ignore
+ */
 const http = axios.create();
 
 export class Crawler extends EventEmitter {

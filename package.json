@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "rimraf ./dist && tsc -w -p ./",
     "build": "rimraf ./dist && tsc -d -p ./",
-    "generate:docs": "npx typedoc --out ./docs ./src/index.ts --tsconfig --exclude ./src/example/",
+    "generate:docs": "npx typedoc ./src --out ./docs --exclude \"**/*+(index|.spec|.e2e|.test|_*).ts\" --excludeExternals --excludePrivate --excludeProtected --mode file --theme minimal --readme none --hideGenerator",
     "deploy:docs": "rimraf ./docs && npm run generate:docs && npx gh-pages -d ./docs"
   },
   "repository": {

@@ -1,6 +1,6 @@
 import * as retry from "p-retry";
 import * as timeout from "p-timeout";
-import { Persistence } from "./Persistence";
+import { Persistence } from "./_Persistence";
 export interface Task<T> {
   name: string;
   data?: T;

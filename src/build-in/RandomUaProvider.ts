@@ -1,8 +1,14 @@
 import { Agent } from "../provider/Agent";
-const ua = require("modern-random-ua");
 
+/**
+ * Build-in Agent provider.
+ * Set random `Usage-Agent` for every request.
+ */
 export class RandomUserAgentProvider implements Agent {
+  /**
+   * Resolve random `Usage-Agent`
+   */
   async resolve() {
-    return ua.generate() as string;
+    return require("modern-random-ua").generate() as string;
   }
 }
