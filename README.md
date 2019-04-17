@@ -80,6 +80,10 @@ spider.on("data", data => {
 spider.start();
 ```
 
+### API Reference
+
+[API Reference](http://axetroy.github.io/crawler)
+
 ### Example
 
 [here](https://github.com/axetroy/crawler/tree/master/src/example) is the examples.
