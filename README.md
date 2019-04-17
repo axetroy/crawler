@@ -16,7 +16,8 @@
 import { Crawler, Provider, Response } from "@axetroy/crawler";
 
 class MyProvider implements Provider {
-  urls = ["https://example/cate/1"];
+  // defined started url
+  urls = ["https://example/cate/1?page=1"];
   // defined how to parse data
   async parse(respone: Response) {
     const $ = cheerio.load(response.data);
@@ -32,11 +33,11 @@ class MyProvider implements Provider {
         .get()
     };
   }
-  // Should crawler get data from next page?
+  // should crawler get data from next page?
   async next(response: Response) {
     const url = new URL(response.config.url);
     const $ = cheerio.load(response.data);
-    // 当前第 n 页
+    // get current page
     const page = $(".page_current")
       .eq(0)
       .text()
