@@ -8,7 +8,7 @@
     "watch": "rimraf ./dist && tsc -w -p ./",
     "build": "rimraf ./dist && tsc -d -p ./",
     "generate:docs": "npx typedoc --out ./docs ./src/index.ts --tsconfig --exclude ./src/example/",
-    "deploy:docs": "npm run generate:docs && npx gh-pages -d ./docs"
+    "deploy:docs": "rimraf ./docs && npm run generate:docs && npx gh-pages -d ./docs"
   },
   "repository": {
     "type": "git",
