@@ -1,11 +1,5 @@
 import { URL } from "url";
-import {
-  Crawler,
-  Provider,
-  Response,
-  HeaderProvider,
-  ProxyProvider
-} from "../index";
+import { Crawler, Provider, Response, Headers, Proxy } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
 import * as cheerio from "cheerio";
 
@@ -60,7 +54,7 @@ class V2exProvider implements Provider {
   }
 }
 
-class Headers implements HeaderProvider {
+class MyHeaders implements Headers {
   async resolve() {
     return {
       // "X-Forwarded-For": "54.13.13.55"
@@ -68,7 +62,7 @@ class Headers implements HeaderProvider {
   }
 }
 
-class Proxy implements ProxyProvider {
+class MyProxy implements Proxy {
   async resolve() {
     return {
       host: "https://27.42.173.133",
@@ -84,8 +78,8 @@ const spider = new Crawler({
   retry: 5,
   provider: new V2exProvider(),
   agent: new RandomUserAgentProvider(),
-  headers: new Headers(),
-  proxy: new Proxy(),
+  headers: new MyHeaders(),
+  proxy: new MyProxy(),
   logger: {
     log(msg) {
       console.log(msg);

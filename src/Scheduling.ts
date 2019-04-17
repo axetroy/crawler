@@ -6,7 +6,7 @@ export interface Task<T> {
   data?: T;
 }
 
-interface Options {
+export interface Options {
   concurrency?: number;
   timeout?: number;
   retry?: number;

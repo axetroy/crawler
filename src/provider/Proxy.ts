@@ -1,5 +1,5 @@
 import { AxiosProxyConfig } from "axios";
 
-export interface ProxyProvider {
+export interface Proxy {
   resolve(url: string, method: string): Promise<AxiosProxyConfig | false>;
 }

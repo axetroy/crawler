@@ -64,3 +64,4 @@ yarn.lock
 package-lock.json
 .crawler.json
 dist
+docs
