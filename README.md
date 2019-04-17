@@ -26,6 +26,7 @@ npm install @axetroy/crawler
 
 ```typescript
 import { Crawler, Provider, Response } from "@axetroy/crawler";
+import * as cheerio from "cheerio";
 
 class MyProvider implements Provider {
   // defined started url
