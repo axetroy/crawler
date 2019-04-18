@@ -78,7 +78,7 @@ export class Crawler extends EventEmitter {
   /**
    * start crawl
    */
-  start() {
+  public start() {
     const { provider, persistence } = this.config;
 
     const crawlerPathExist = fs.pathExistsSync(crawlerFilepath);
@@ -99,7 +99,7 @@ export class Crawler extends EventEmitter {
   /**
    * stop crawl
    */
-  stop() {
+  public stop() {
     this._active = false;
     if (this._scheduling) {
       this._scheduling.clear();

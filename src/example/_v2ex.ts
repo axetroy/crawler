@@ -3,7 +3,8 @@ import { Crawler, Provider, Response, Headers, Proxy } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
 import * as cheerio from "cheerio";
 
-class V2exProvider implements Provider {
+class V2EX implements Provider {
+  name = "v2ex";
   urls = [
     "https://www.v2ex.com/go/chrome",
     "https://www.v2ex.com/go/safari",
@@ -76,7 +77,7 @@ const spider = new Crawler({
   interval: 0,
   persistence: true,
   retry: 5,
-  provider: new V2exProvider(),
+  provider: new V2EX(),
   agent: new RandomUserAgentProvider(),
   headers: new MyHeaders(),
   proxy: new MyProxy(),

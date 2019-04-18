@@ -2,6 +2,10 @@ import { AxiosResponse } from "axios";
 
 export interface Provider {
   /**
+   * The name of provider
+   */
+  name: string;
+  /**
    * The urls that was originally crawled
    */
   urls: string[];

@@ -3,7 +3,8 @@ import { Crawler, Provider, Response } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
 import * as cheerio from "cheerio";
 
-class ZhihuProvider implements Provider {
+class Baidu implements Provider {
+  name = "baidu";
   urls = [
     "https://www.baidu.com/s?wd=chrome",
     "https://www.baidu.com/s?wd=firefox",
@@ -50,7 +51,7 @@ const spider = new Crawler({
   interval: 0,
   persistence: true,
   retry: 5,
-  provider: new ZhihuProvider(),
+  provider: new Baidu(),
   agent: new RandomUserAgentProvider(),
   logger: {
     log(msg) {

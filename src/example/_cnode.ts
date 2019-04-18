@@ -1,5 +1,5 @@
 import { URL } from "url";
-import { Crawler, Provider, Response, Headers, Proxy } from "../index";
+import { Crawler, Provider, Response } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
 import * as cheerio from "cheerio";
 import * as fs from "fs-extra";
@@ -7,7 +7,8 @@ import * as path from "path";
 
 const domain = "https://cnodejs.org/";
 
-class CnodeProvider implements Provider {
+class CNode implements Provider {
+  name = "CNode";
   urls = [domain];
   async parse(response: Response) {
     const $ = cheerio.load(response.data);
@@ -56,7 +57,7 @@ const spider = new Crawler({
   interval: 0,
   persistence: false,
   retry: 5,
-  provider: new CnodeProvider(),
+  provider: new CNode(),
   agent: new RandomUserAgentProvider(),
   logger: {
     log(msg) {
