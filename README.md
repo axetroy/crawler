@@ -29,6 +29,7 @@ import { Crawler, Provider, Response } from "@axetroy/crawler";
 import * as cheerio from "cheerio";
 
 class MyProvider implements Provider {
+  name = "my provider"
   // defined started url
   urls = ["https://example/cate/1?page=1"];
   // defined how to parse data
