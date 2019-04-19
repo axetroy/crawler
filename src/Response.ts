@@ -34,6 +34,7 @@ export function CreateResponse(
     return select(selector);
   }
 
+  // @ts-ignore
   const $ = Object.assign(selector, response, cheerio) as Response;
 
   $.download = (
@@ -42,6 +43,7 @@ export function CreateResponse(
     options: download.DownloadOptions
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
+      // @ts-ignore
       download(url, undefined, options)
         .pipe(fs.createWriteStream(filepath))
         .once("error", err => {

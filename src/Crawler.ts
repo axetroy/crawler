@@ -8,7 +8,7 @@ import { Agent } from "./provider/Agent";
 import { Proxy } from "./provider/Proxy";
 import { Headers } from "./provider/Headers";
 import { Auth } from "./provider/Auth";
-import * as pRetry from "p-retry";
+import pRetry from "p-retry";
 
 /**
  * @ignore
@@ -48,6 +48,9 @@ export class Crawler extends EventEmitter implements ICrawler {
       this.emit("error", err, task);
     });
 
+    /**
+     * Where there is no task to do
+     */
     this.scheduling.on("finish", () => {
       this.emit("finish");
     });

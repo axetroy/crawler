@@ -17,7 +17,7 @@ class ScrapinghubProvider implements Provider {
 }
 
 const spider = new Crawler(ScrapinghubProvider, {
-  timeout: 1000 * 1,
+  timeout: 1000 * 5,
   retry: 3
 });
 

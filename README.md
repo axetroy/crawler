@@ -75,7 +75,10 @@ spider.start();
 
 ### Example
 
-[here](https://github.com/axetroy/crawler/tree/master/src/example) is the examples.
+[这里](https://github.com/axetroy/crawler/tree/master/examples)有相关的例子
+
+- [基本的爬虫](https://github.com/axetroy/crawler/tree/master/examples/basic.ts)
+- [多个目标地址爬虫](https://github.com/axetroy/crawler/tree/master/examples/multiple-urls.ts)
 
 ### 捐赠我
 
