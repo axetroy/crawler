@@ -32,7 +32,7 @@ class ChinaZProvider implements Provider {
       const url = URL.parse(imageUrl);
       const filePath = path.join(__dirname, "images", url.pathname);
       await fs.ensureDir(path.dirname(filePath));
-      await $.download(imageUrl, filePath).catch(err => {
+      $.download(imageUrl, filePath).catch(err => {
         console.error(err.toString());
       });
     }
@@ -49,7 +49,7 @@ const spider = new Crawler(ChinaZProvider, {
 
 spider.on("data", (resultList: string[]) => {
   for (const result of resultList) {
-    console.log(result);
+    console.log("downloading...", result);
   }
 });
 
