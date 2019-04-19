@@ -38,7 +38,7 @@ export class Scheduling {
     const timeoutAction = timeout(
       this.cb(task),
       this.options.timeout,
-      `request '${task.data}' timeout.`
+      `Request '${task.data}' timeout.`
     );
     const action = retry(() => timeoutAction, {
       retries: this.options.retry,

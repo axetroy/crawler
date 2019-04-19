@@ -11,6 +11,19 @@ class V2EX implements Provider {
   ];
   // 提取数据
   async parse($: Response) {
+    const url = new URL($.config.url);
+    // 当前第 n 页
+    const page = $(".page_current")
+      .eq(0)
+      .text()
+      .trim();
+
+    if (+page < 20) {
+      url.searchParams.delete("p");
+      url.searchParams.append("p", page + 1 + "");
+      $.follow(url.toString());
+    }
+
     return {
       url: $.config.url,
       // content: response.data,
@@ -23,23 +36,6 @@ class V2EX implements Provider {
         })
         .get()
     };
-  }
-  // 是否应该进行下一页的数据爬取
-  async next($: Response) {
-    const url = new URL($.config.url);
-    // 当前第 n 页
-    const page = $(".page_current")
-      .eq(0)
-      .text()
-      .trim();
-
-    if (+page < 20) {
-      url.searchParams.delete("p");
-      url.searchParams.append("p", page + 1 + "");
-      return url.toString();
-    } else {
-      return null;
-    }
   }
 }
 

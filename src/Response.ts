@@ -2,6 +2,8 @@ import { AxiosResponse } from "axios";
 import * as cheerio from "cheerio";
 import * as download from "download";
 import * as fs from "fs-extra";
+import { ICrawler } from "./Crawler";
+import { Scheduling } from "./_Scheduling";
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   download(
@@ -12,7 +14,11 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   follow(url: string): void;
 }
 
-export function CreateResponse(response: AxiosResponse) {
+export function CreateResponse(
+  response: AxiosResponse,
+  crawler: ICrawler,
+  scheduling: Scheduling
+) {
   const $: Response = function(selector: string) {
     return cheerio.load(response.data)(selector);
   };
@@ -41,8 +47,14 @@ export function CreateResponse(response: AxiosResponse) {
     });
   };
 
+  const { interval } = crawler.config;
+
   // 跟着跳到下一个链接
-  $.follow = (url: string) => {};
+  $.follow = (nextUrl: string) => {
+    if (crawler.active && nextUrl) {
+      scheduling.push({ name: nextUrl, data: nextUrl });
+    }
+  };
 
   $.load = cheerio.load.bind(cheerio);
   $.xml = cheerio.xml.bind(cheerio);

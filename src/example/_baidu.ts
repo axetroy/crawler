@@ -17,9 +17,16 @@ class Baidu implements Provider {
   ];
   // 提取数据
   async parse($: Response) {
+    const url = new URL($.config.url);
+    const pageOffset = +url.searchParams.get("pn") || 0;
+    if (pageOffset < 200) {
+      url.searchParams.delete("pn");
+      url.searchParams.append("pn", pageOffset + 10 + "");
+      $.follow(url.toString());
+    }
+
     return {
       url: $.config.url,
-      // content: response.data,
       items: $(".result h3 a")
         .map((i, el) => {
           return {
@@ -30,18 +37,6 @@ class Baidu implements Provider {
         .get()
     };
   }
-  // 是否应该进行下一页的数据爬取
-  async next($: Response) {
-    const url = new URL($.config.url);
-    const pageOffset = +url.searchParams.get("pn") || 0;
-    if (pageOffset < 200) {
-      url.searchParams.delete("pn");
-      url.searchParams.append("pn", pageOffset + 10 + "");
-      return url.toString();
-    } else {
-      return null;
-    }
-  }
 }
 
 const spider = new Crawler({
@@ -50,12 +45,7 @@ const spider = new Crawler({
   persistence: true,
   retry: 5,
   provider: new Baidu(),
-  agent: new RandomUserAgentProvider(),
-  logger: {
-    log(msg) {
-      // console.log(msg);
-    }
-  }
+  agent: new RandomUserAgentProvider()
 });
 
 spider.on("data", data => {

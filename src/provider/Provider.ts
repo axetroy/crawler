@@ -14,9 +14,4 @@ export interface Provider {
    * @param respone The request response
    */
   parse(respone: Response): Promise<any>;
-  /**
-   * Decide if you should continue to crawl the next url
-   * @param lastResponse The request response
-   */
-  next(respone: Response): Promise<string>;
 }

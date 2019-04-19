@@ -12,8 +12,15 @@ import { CreateResponse } from "./Response";
  */
 const http = axios.create();
 
-export class Crawler extends EventEmitter {
-  private _active = true;
+export interface ICrawler {
+  active: boolean;
+  config: Config;
+  start(): void;
+  stop(): void;
+}
+
+export class Crawler extends EventEmitter implements ICrawler {
+  public active = true;
   private _scheduling: Scheduling;
   constructor(public config: Config) {
     super();
@@ -21,13 +28,7 @@ export class Crawler extends EventEmitter {
 
     const scheduling = new Scheduling(
       async (task: Task<any>) => {
-        const nextUrl = await this._next(task.data as string, "GET");
-        if (interval > 0) {
-          await sleep(interval);
-        }
-        if (this._active && nextUrl) {
-          scheduling.push({ name: nextUrl, data: nextUrl });
-        }
+        this._next(task.data as string, "GET");
       },
       {
         concurrency,
@@ -38,7 +39,7 @@ export class Crawler extends EventEmitter {
 
     this._scheduling = scheduling;
   }
-  private async _next(url: string, method: string): Promise<string> {
+  private async _next(url: string, method: string): Promise<void> {
     const { provider, proxy, agent, logger, headers } = this.config;
 
     // resolve proxy
@@ -66,18 +67,11 @@ export class Crawler extends EventEmitter {
       logger.log(url);
     }
 
-    const response = CreateResponse(httpResponse);
+    const response = CreateResponse(httpResponse, this, this._scheduling);
 
     // parse response
     const data = await provider.parse(response);
     this.emit("data", data);
-
-    // should go to next page?
-    const nextUrl = await provider.next(response);
-    if (nextUrl) {
-      return nextUrl;
-    }
-    return;
   }
   /**
    * start crawl
@@ -104,7 +98,7 @@ export class Crawler extends EventEmitter {
    * stop crawl
    */
   public stop() {
-    this._active = false;
+    this.active = false;
     if (this._scheduling) {
       this._scheduling.clear();
     }

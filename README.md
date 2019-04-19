@@ -33,20 +33,6 @@ class MyProvider implements Provider {
   urls = ["https://example/cate/1?page=1"];
   // defined how to parse data
   async parse($: Response) {
-    return {
-      url: $.config.url,
-      items: $(".item_title a")
-        .map((i, el) => {
-          return {
-            title: $(el).text(),
-            href: $(el).attr("href")
-          };
-        })
-        .get()
-    };
-  }
-  // should crawler get data from next page?
-  async next($: Response) {
     const url = new URL($.config.url);
     // get current page
     const page = $(".page_current")
@@ -58,10 +44,20 @@ class MyProvider implements Provider {
     if (+page < 20) {
       url.searchParams.delete("page");
       url.searchParams.append("page", page + 1 + "");
-      return url.toString(); // return url to go next page
-    } else {
-      return null; // return null mean there is no next page to got
+      $.follow(url.toString()); // return url to go next page
     }
+
+    return {
+      url: $.config.url,
+      items: $(".item_title a")
+        .map((i, el) => {
+          return {
+            title: $(el).text(),
+            href: $(el).attr("href")
+          };
+        })
+        .get()
+    };
   }
 }
 
