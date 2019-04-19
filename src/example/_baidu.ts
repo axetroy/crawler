@@ -39,12 +39,11 @@ class Baidu implements Provider {
   }
 }
 
-const spider = new Crawler({
+const spider = new Crawler(new Baidu(), {
   concurrency: 100,
   interval: 0,
   persistence: true,
   retry: 5,
-  provider: new Baidu(),
   agent: new RandomUserAgentProvider()
 });
 

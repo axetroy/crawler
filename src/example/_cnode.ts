@@ -41,12 +41,11 @@ class CNode implements Provider {
   }
 }
 
-const spider = new Crawler({
+const spider = new Crawler(new CNode(), {
   concurrency: 100,
   interval: 0,
   persistence: false,
   retry: 5,
-  provider: new CNode(),
   agent: new RandomUserAgentProvider(),
   logger: {
     log(msg) {

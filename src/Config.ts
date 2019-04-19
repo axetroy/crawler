@@ -2,9 +2,8 @@ import { Agent } from "./provider/Agent";
 import { Proxy } from "./provider/Proxy";
 import { Logger } from "./provider/Logger";
 import { Headers } from "./provider/Header";
-import { Provider } from "./provider/Provider";
 
-export interface Config {
+export interface Options {
   /**
    * The max concurrency of request. Default `1`.
    */
@@ -45,8 +44,4 @@ export interface Config {
    * The logger provider.
    */
   logger?: Logger;
-  /**
-   * The main provider you want to crawl. required.
-   */
-  provider: Provider;
 }

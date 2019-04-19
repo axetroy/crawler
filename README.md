@@ -61,9 +61,7 @@ class MyProvider implements Provider {
   }
 }
 
-const spider = new Crawler({
-  provider: MyProvider
-});
+const spider = new Crawler(new MyProvider());
 
 spider.on("data", data => {
   // here is the data you got.

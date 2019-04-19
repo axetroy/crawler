@@ -2,10 +2,10 @@ import { EventEmitter } from "events";
 import * as fs from "fs-extra";
 import axios from "axios";
 import { Task, Scheduling } from "./_Scheduling";
-import { sleep } from "./_utils";
 import { crawlerFilepath } from "./_constant";
-import { Config } from "./Config";
+import { Options } from "./Config";
 import { CreateResponse } from "./Response";
+import { Provider } from "./provider/Provider";
 
 /**
  * @ignore
@@ -14,7 +14,7 @@ const http = axios.create();
 
 export interface ICrawler {
   active: boolean;
-  config: Config;
+  options: Options;
   start(): void;
   stop(): void;
 }
@@ -22,9 +22,9 @@ export interface ICrawler {
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
   private _scheduling: Scheduling;
-  constructor(public config: Config) {
+  constructor(private provider: Provider, public options: Options) {
     super();
-    const { concurrency, interval, timeout, retry } = this.config;
+    const { concurrency, timeout, retry } = this.options;
 
     const scheduling = new Scheduling(
       async (task: Task<any>) => {
@@ -40,7 +40,7 @@ export class Crawler extends EventEmitter implements ICrawler {
     this._scheduling = scheduling;
   }
   private async _next(url: string, method: string): Promise<void> {
-    const { provider, proxy, agent, logger, headers } = this.config;
+    const { proxy, agent, logger, headers } = this.options;
 
     // resolve proxy
     const _proxy = proxy ? await proxy.resolve(url, method) : false;
@@ -70,14 +70,14 @@ export class Crawler extends EventEmitter implements ICrawler {
     const response = CreateResponse(httpResponse, this, this._scheduling);
 
     // parse response
-    const data = await provider.parse(response);
+    const data = await this.provider.parse(response);
     this.emit("data", data);
   }
   /**
    * start crawl
    */
   public start() {
-    const { provider, persistence } = this.config;
+    const { persistence } = this.options;
 
     const crawlerPathExist = fs.pathExistsSync(crawlerFilepath);
 
@@ -90,8 +90,8 @@ export class Crawler extends EventEmitter implements ICrawler {
       }
     }
 
-    for (const url of provider.urls) {
-      this._scheduling.push({ name: url, data: url });
+    for (const url of this.provider.urls) {
+      this._scheduling.push(new Task(url, url));
     }
   }
   /**

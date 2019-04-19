@@ -1,9 +1,14 @@
 import * as retry from "p-retry";
 import * as timeout from "p-timeout";
 import { Persistence } from "./_Persistence";
-export interface Task<T> {
-  name: string;
-  data?: T;
+
+let id = 0;
+
+export class Task<T> {
+  public id: number;
+  constructor(public name: string, public data?: T) {
+    this.id = ++id;
+  }
 }
 
 export interface Options {
@@ -27,13 +32,17 @@ export class Scheduling {
     this.options.retry = this.options.retry || 0;
     this._persistence = new Persistence();
   }
-  private _syncPersistence() {
+  private syncPersistence() {
     if (this.shouldPersistence) {
       // update crawler file
       this._persistence.sync(this._runningQueue);
     }
   }
-  private _exec(task: Task<any>): Promise<any> {
+  /**
+   * execute a task
+   * @param task a task to execute
+   */
+  private exec(task: Task<any>): Promise<any> {
     // set timeout and retry
     const timeoutAction = timeout(
       this.cb(task),
@@ -49,19 +58,23 @@ export class Scheduling {
 
     return action;
   }
-  private _next() {
+  /**
+   * Go to the next task
+   */
+  private next() {
     const queue = this._queue;
 
     // if queue is empty or is busy then return
     if (!queue.length || this.running >= this.options.concurrency) return;
+
     this.running = this.running + 1;
     const task = queue.shift();
 
     this._runningQueue.push(task);
 
-    this._syncPersistence();
+    this.syncPersistence();
 
-    this._exec(task)
+    this.exec(task)
       .catch(() => {
         // ignore error
       })
@@ -70,21 +83,31 @@ export class Scheduling {
         // remove running task
         const currentTaskIndex = this._runningQueue.findIndex(t => t === task);
         this._runningQueue.splice(currentTaskIndex, 1);
-        this._syncPersistence();
+        this.syncPersistence();
       });
   }
+  /**
+   * Sync the next
+   */
   public sync() {
     this._queue = this._persistence.sync();
     if (!this._queue.length) {
       console.log("found crawler.json but no task.");
     }
-    this._next();
+    this.next();
   }
+  /**
+   * Push a new task to the pool
+   * @param task a new task
+   */
   public push(task: Task<any>) {
     this._queue.push(task);
-    this._next();
+    this.next();
   }
-  clear() {
+  /**
+   * Clear the queue
+   */
+  public clear() {
     this._queue = [];
   }
 }
