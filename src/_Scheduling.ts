@@ -1,10 +1,11 @@
 import { EventEmitter } from "events";
+import { Method, Body } from "./provider/Provider";
 
 let id = 0;
 
 export class Task<T> {
   public id: number;
-  constructor(public name: string, public data?: T) {
+  constructor(public url: string, public method?: Method, public body?: Body) {
     this.id = ++id;
   }
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 import { Task, Scheduling } from "./_Scheduling";
 import { Options } from "./Config";
 import { CreateResponse } from "./_Response";
-import { Provider, ProviderFactory } from "./provider/Provider";
+import { Provider, ProviderFactory, Method, Body } from "./provider/Provider";
 import { Agent } from "./provider/Agent";
 import { Proxy } from "./provider/Proxy";
 import { Headers } from "./provider/Headers";
@@ -53,10 +53,14 @@ export class Crawler extends EventEmitter implements ICrawler {
     });
 
     this.scheduling.subscribe(async task => {
-      await this.request(task.name, "GET");
+      await this.request(task.url, task.method, task.body);
     });
   }
-  private async request(url: string, method: string): Promise<void> {
+  private async request(
+    url: string,
+    method: Method = "GET",
+    body?: Body
+  ): Promise<void> {
     const { timeout, retry } = this.options;
 
     const [_proxy, userAgent, headers, auth] = await Promise.all([
@@ -72,6 +76,7 @@ export class Crawler extends EventEmitter implements ICrawler {
         method,
         proxy: _proxy,
         timeout,
+        data: body,
         auth,
         headers: {
           ...headers,
@@ -106,7 +111,11 @@ export class Crawler extends EventEmitter implements ICrawler {
    */
   public start() {
     for (const url of this.provider.urls) {
-      this.scheduling.push(new Task(url, url));
+      if (typeof url === "string") {
+        this.scheduling.push(new Task(url));
+      } else {
+        this.scheduling.push(new Task(url.url, url.method, url.body));
+      }
     }
   }
   /**

@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import * as download from "download";
 import * as fs from "fs-extra";
 import { ICrawler } from "./Crawler";
+import { Url } from "./provider/Provider";
 import { Scheduling, Task } from "./_Scheduling";
 import { sleep } from "./_utils";
 
@@ -50,9 +51,12 @@ export function CreateResponse(
   const { interval } = crawler.options;
 
   // 跟着跳到下一个链接
-  $.follow = (nextUrl: string) => {
+  $.follow = (nextUrl: Url) => {
     if (crawler.active && nextUrl) {
-      const task = new Task(nextUrl, nextUrl);
+      const task =
+        typeof nextUrl === "string"
+          ? new Task(nextUrl)
+          : new Task(nextUrl.url, nextUrl.method, nextUrl.body);
       if (interval) {
         sleep(interval).then(() => scheduling.push(task));
       } else {
