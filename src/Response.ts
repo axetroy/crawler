@@ -4,7 +4,11 @@ import * as download from "download";
 import * as fs from "fs-extra";
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
-  download(url: string, filepath: string): Promise<void>;
+  download(
+    url: string,
+    filepath: string,
+    options: download.DownloadOptions
+  ): Promise<void>;
   follow(url: string): void;
 }
 
@@ -19,9 +23,13 @@ export function CreateResponse(response: AxiosResponse) {
   $.headers = response.headers;
   $.data = response.data;
 
-  $.download = (url: string, filepath: string) => {
+  $.download = (
+    url: string,
+    filepath: string,
+    options: download.DownloadOptions
+  ) => {
     return new Promise((resolve, reject) => {
-      download(url)
+      download(url, undefined, options)
         .pipe(fs.createWriteStream(filepath))
         .once("error", err => {
           reject(err);

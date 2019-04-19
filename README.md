@@ -3,20 +3,20 @@
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
-### crawler framework for nodejs
+### Nodejs 的爬虫框架
 
-This is a crawler framework for fast development.
+为了实现快速开发爬虫而写的框架。
 
-Currently still in development and any existing features may change.
+> WARNING: 当前仍处于开发阶段，任何存在的特性都可能会更改或者移除
 
-### Featrue
+### 特性
 
-- [x] All is provider. eg. `Agent`/`Header`/`Proxy`
-- [x] Access frequency limit
-- [x] Breakpoint continued crawl
-- [x] IP address proxy
-- [ ] Headless mode
-- [x] Build-in provider
+- [x] 访问频率限制
+- [x] 暂停和恢复爬取
+- [x] 内置的 jQuery 选择器
+- [x] 内置的资源下载工具
+- [x] IP 代理设置
+- [ ] 数据统计
 
 ### Usage
 
