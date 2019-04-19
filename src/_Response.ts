@@ -25,8 +25,13 @@ export function CreateResponse(
    * jQuery selector
    * @param selector selector string
    */
+  let select: CheerioStatic;
   function selector(selector: string) {
-    return cheerio.load(response.data)(selector);
+    if (select) {
+      return select(selector);
+    }
+    select = cheerio.load(response.data);
+    return select(selector);
   }
 
   const $ = Object.assign(selector, response, cheerio) as Response;
