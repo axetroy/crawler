@@ -62,7 +62,7 @@ const spider = new Crawler({
   }
 });
 
-const outputFile = path.join(__dirname, "cnode.md");
+const outputFile = path.join(__dirname, "data", "cnode.md");
 
 spider.on("data", data => {
   const rows = data.items
