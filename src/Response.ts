@@ -4,8 +4,8 @@ import * as download from "download";
 import * as fs from "fs-extra";
 import { ICrawler } from "./Crawler";
 import { Url } from "./provider/Provider";
-import { Scheduling, Task } from "./_Scheduling";
-import { sleep } from "./_utils";
+import { Scheduling, Task } from "./Scheduling";
+import { sleep } from "./utils";
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   download(

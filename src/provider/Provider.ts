@@ -1,5 +1,5 @@
 import { Stream } from "stream";
-import { Response } from "../_Response";
+import { Response } from "../Response";
 import { Options } from "../Config";
 
 export type JSONPrimitive = string | number | boolean | null;

@@ -1,6 +1,6 @@
 import * as fs from "fs-extra";
-import { Task } from "./_Scheduling";
-import { crawlerFilepath } from "./_constant";
+import { Task } from "./Scheduling";
+import { crawlerFilepath } from "./Constant";
 
 export class Persistence {
   private filename = crawlerFilepath;

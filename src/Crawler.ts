@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
 import axios from "axios";
-import { Task, Scheduling } from "./_Scheduling";
+import { Task, Scheduling } from "./Scheduling";
 import { Options } from "./Config";
-import { CreateResponse } from "./_Response";
+import { CreateResponse } from "./Response";
 import { Provider, ProviderFactory, Method, Body } from "./provider/Provider";
 import { Agent } from "./provider/Agent";
 import { Proxy } from "./provider/Proxy";
