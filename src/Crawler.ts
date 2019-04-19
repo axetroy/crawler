@@ -3,7 +3,7 @@ import axios from "axios";
 import { Task, Scheduling } from "./_scheduling";
 import { Options } from "./Config";
 import { CreateResponse } from "./Response";
-import { Provider } from "./provider/Provider";
+import { Provider, ProviderFactory } from "./provider/Provider";
 import * as pRetry from "p-retry";
 
 /**
@@ -21,8 +21,10 @@ export interface ICrawler {
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
   private scheduling: Scheduling;
-  constructor(private provider: Provider, public options: Options = {}) {
+  private provider: Provider;
+  constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
+    this.provider = new ProviderClass(options);
     const { concurrency } = this.options;
 
     this.scheduling = new Scheduling({ concurrency });

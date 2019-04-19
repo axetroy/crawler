@@ -22,7 +22,7 @@ class ScrapinghubProvider implements Provider {
   }
 }
 
-const spider = new Crawler(new ScrapinghubProvider());
+const spider = new Crawler(ScrapinghubProvider);
 
 spider.on("data", data => {
   console.log(data);

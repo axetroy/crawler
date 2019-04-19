@@ -1,4 +1,9 @@
 import { Response } from "../Response";
+import { Options } from "../Config";
+
+export interface ProviderFactory {
+  new (options?: Options): Provider;
+}
 
 export interface Provider {
   /**

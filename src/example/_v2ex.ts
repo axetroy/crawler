@@ -56,7 +56,7 @@ class MyProxy implements Proxy {
   }
 }
 
-const spider = new Crawler(new V2EX(), {
+const spider = new Crawler(V2EX, {
   concurrency: 100,
   interval: 0,
   persistence: true,

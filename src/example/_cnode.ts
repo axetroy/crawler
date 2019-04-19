@@ -41,7 +41,7 @@ class CNode implements Provider {
   }
 }
 
-const spider = new Crawler(new CNode(), {
+const spider = new Crawler(CNode, {
   concurrency: 100,
   interval: 0,
   persistence: false,

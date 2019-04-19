@@ -5,3 +5,4 @@ export * from "./provider/Agent";
 export * from "./provider/Logger";
 export * from "./provider/Header";
 export * from "./Response";
+export * from "./Config";
