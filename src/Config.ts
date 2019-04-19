@@ -1,6 +1,7 @@
 import { AgentFactory } from "./provider/Agent";
 import { ProxyFactory } from "./provider/Proxy";
 import { HeadersFactory } from "./provider/Headers";
+import { AuthFactory } from "./provider/Auth";
 
 export interface Options {
   /**
@@ -39,4 +40,8 @@ export interface Options {
    * The headers provider.
    */
   headers?: HeadersFactory;
+  /**
+   * The auth provider.
+   */
+  auth?: AuthFactory;
 }
