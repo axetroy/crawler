@@ -1,11 +1,10 @@
 import { EventEmitter } from "events";
-import * as fs from "fs-extra";
 import axios from "axios";
-import { Task, Scheduling } from "./_Scheduling";
-import { crawlerFilepath } from "./_constant";
+import { Task, Scheduling } from "./_scheduling";
 import { Options } from "./Config";
 import { CreateResponse } from "./Response";
 import { Provider } from "./provider/Provider";
+import * as pRetry from "p-retry";
 
 /**
  * @ignore
@@ -21,26 +20,26 @@ export interface ICrawler {
 
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
-  private _scheduling: Scheduling;
+  private scheduling: Scheduling;
   constructor(private provider: Provider, public options: Options = {}) {
     super();
-    const { concurrency, timeout, retry } = this.options;
+    const { concurrency } = this.options;
 
-    const scheduling = new Scheduling(
-      async (task: Task<any>) => {
-        this._next(task.data as string, "GET");
-      },
-      {
-        concurrency,
-        timeout,
-        retry
-      }
-    );
+    this.scheduling = new Scheduling({ concurrency });
 
-    this._scheduling = scheduling;
+    /**
+     * it can re-run the task with this `this.scheduling.push(task);`
+     */
+    this.scheduling.on("error", (task, err) => {
+      this.emit("error", task, err);
+    });
+
+    this.scheduling.subscribe(async task => {
+      await this.request(task.name, "GET");
+    });
   }
-  private async _next(url: string, method: string): Promise<void> {
-    const { proxy, agent, logger, headers } = this.options;
+  private async request(url: string, method: string): Promise<void> {
+    const { proxy, agent, logger, headers, timeout, retry } = this.options;
 
     // resolve proxy
     const _proxy = proxy ? await proxy.resolve(url, method) : false;
@@ -51,14 +50,31 @@ export class Crawler extends EventEmitter implements ICrawler {
     // resolve headers
     const _headers = headers ? await headers.resolve(url, method) : {};
 
+    const request = async () => {
+      return await http.request({
+        url,
+        method,
+        proxy: _proxy,
+        timeout,
+        headers: {
+          ..._headers,
+          ...(userAgent ? { "User-Agent": userAgent } : {})
+        }
+      });
+    };
+
     // send request
-    const httpResponse = await http.request({
-      url,
-      method,
-      proxy: _proxy,
-      headers: {
-        ..._headers,
-        ...(userAgent ? { "User-Agent": userAgent } : {})
+    const httpResponse = await pRetry(request, {
+      retries: retry || 0,
+      onFailedAttempt: error => {
+        console.log(
+          `Attempt ${error.attemptNumber} failed. There are ${
+            error.retriesLeft
+          } retries left.`
+        );
+        // 1st request => Attempt 1 failed. There are 4 retries left.
+        // 2nd request => Attempt 2 failed. There are 3 retries left.
+        // …
       }
     });
 
@@ -67,7 +83,7 @@ export class Crawler extends EventEmitter implements ICrawler {
       logger.log(url);
     }
 
-    const response = CreateResponse(httpResponse, this, this._scheduling);
+    const response = CreateResponse(httpResponse, this, this.scheduling);
 
     // parse response
     const data = await this.provider.parse(response);
@@ -77,21 +93,8 @@ export class Crawler extends EventEmitter implements ICrawler {
    * start crawl
    */
   public start() {
-    const { persistence } = this.options;
-
-    const crawlerPathExist = fs.pathExistsSync(crawlerFilepath);
-
-    this._scheduling.shouldPersistence = persistence;
-
-    if (this._scheduling.shouldPersistence) {
-      if (crawlerPathExist) {
-        this._scheduling.sync();
-        return;
-      }
-    }
-
     for (const url of this.provider.urls) {
-      this._scheduling.push(new Task(url, url));
+      this.scheduling.push(new Task(url, url));
     }
   }
   /**
@@ -99,8 +102,8 @@ export class Crawler extends EventEmitter implements ICrawler {
    */
   public stop() {
     this.active = false;
-    if (this._scheduling) {
-      this._scheduling.clear();
+    if (this.scheduling) {
+      this.scheduling.clear();
     }
   }
 }
