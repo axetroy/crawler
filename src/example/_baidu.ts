@@ -1,7 +1,6 @@
 import { URL } from "url";
 import { Crawler, Provider, Response } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
-import * as cheerio from "cheerio";
 
 class Baidu implements Provider {
   name = "baidu";
@@ -17,10 +16,9 @@ class Baidu implements Provider {
     "https://www.baidu.com/s?wd=soon"
   ];
   // 提取数据
-  async parse(response: Response) {
-    const $ = cheerio.load(response.data);
+  async parse($: Response) {
     return {
-      url: response.config.url,
+      url: $.config.url,
       // content: response.data,
       items: $(".result h3 a")
         .map((i, el) => {
@@ -33,8 +31,8 @@ class Baidu implements Provider {
     };
   }
   // 是否应该进行下一页的数据爬取
-  async next(lastResponse: Response) {
-    const url = new URL(lastResponse.config.url);
+  async next($: Response) {
+    const url = new URL($.config.url);
     const pageOffset = +url.searchParams.get("pn") || 0;
     if (pageOffset < 200) {
       url.searchParams.delete("pn");

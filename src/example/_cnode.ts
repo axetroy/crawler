@@ -1,7 +1,6 @@
 import { URL } from "url";
 import { Crawler, Provider, Response } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
-import * as cheerio from "cheerio";
 import * as fs from "fs-extra";
 import * as path from "path";
 
@@ -10,10 +9,9 @@ const domain = "https://cnodejs.org/";
 class CNode implements Provider {
   name = "CNode";
   urls = [domain];
-  async parse(response: Response) {
-    const $ = cheerio.load(response.data);
+  async parse($: Response) {
     return {
-      url: response.config.url,
+      url: $.config.url,
       items: $("a.topic_title")
         .map((i, el) => {
           return {
@@ -27,10 +25,8 @@ class CNode implements Provider {
     };
   }
   // 是否应该进行下一页的数据爬取
-  async next(response: Response) {
-    const url = new URL(response.config.url);
-    // const page = +url.searchParams.get("p") || 1; // 当前第 n 页
-    const $ = cheerio.load(response.data);
+  async next($: Response) {
+    const url = new URL($.config.url);
     // 当前第 n 页
     const $pagination = $(".pagination");
     if (!$pagination) {

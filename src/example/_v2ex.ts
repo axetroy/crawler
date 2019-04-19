@@ -1,7 +1,6 @@
 import { URL } from "url";
 import { Crawler, Provider, Response, Headers, Proxy } from "../index";
 import { RandomUserAgentProvider } from "../build-in";
-import * as cheerio from "cheerio";
 
 class V2EX implements Provider {
   name = "v2ex";
@@ -11,10 +10,9 @@ class V2EX implements Provider {
     "https://www.v2ex.com/go/firefox"
   ];
   // 提取数据
-  async parse(response: Response) {
-    const $ = cheerio.load(response.data);
+  async parse($: Response) {
     return {
-      url: response.config.url,
+      url: $.config.url,
       // content: response.data,
       items: $(".item_title a")
         .map((i, el) => {
@@ -27,10 +25,8 @@ class V2EX implements Provider {
     };
   }
   // 是否应该进行下一页的数据爬取
-  async next(response: Response) {
-    const url = new URL(response.config.url);
-    // const page = +url.searchParams.get("p") || 1; // 当前第 n 页
-    const $ = cheerio.load(response.data);
+  async next($: Response) {
+    const url = new URL($.config.url);
     // 当前第 n 页
     const page = $(".page_current")
       .eq(0)
@@ -44,14 +40,6 @@ class V2EX implements Provider {
     } else {
       return null;
     }
-
-    // if (pageOffset < 200) {
-    //   url.searchParams.delete("pn");
-    //   url.searchParams.append("pn", pageOffset + 10 + "");
-    //   return url.toString();
-    // } else {
-    //   return null;
-    // }
   }
 }
 

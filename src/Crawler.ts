@@ -5,6 +5,7 @@ import { Task, Scheduling } from "./_Scheduling";
 import { sleep } from "./_utils";
 import { crawlerFilepath } from "./_constant";
 import { Config } from "./Config";
+import { CreateResponse } from "./Response";
 
 /**
  * @ignore
@@ -50,8 +51,9 @@ export class Crawler extends EventEmitter {
     const _headers = headers ? await headers.resolve(url, method) : {};
 
     // send request
-    const response = await http.request({
+    const httpResponse = await http.request({
       url,
+      method,
       proxy: _proxy,
       headers: {
         ..._headers,
@@ -63,6 +65,8 @@ export class Crawler extends EventEmitter {
     if (logger) {
       logger.log(url);
     }
+
+    const response = CreateResponse(httpResponse);
 
     // parse response
     const data = await provider.parse(response);

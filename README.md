@@ -26,17 +26,15 @@ npm install @axetroy/crawler
 
 ```typescript
 import { Crawler, Provider, Response } from "@axetroy/crawler";
-import * as cheerio from "cheerio";
 
 class MyProvider implements Provider {
   name = "my provider"
   // defined started url
   urls = ["https://example/cate/1?page=1"];
   // defined how to parse data
-  async parse(respone: Response) {
-    const $ = cheerio.load(response.data);
+  async parse($: Response) {
     return {
-      url: response.config.url,
+      url: $.config.url,
       items: $(".item_title a")
         .map((i, el) => {
           return {
@@ -48,9 +46,8 @@ class MyProvider implements Provider {
     };
   }
   // should crawler get data from next page?
-  async next(response: Response) {
-    const url = new URL(response.config.url);
-    const $ = cheerio.load(response.data);
+  async next($: Response) {
+    const url = new URL($.config.url);
     // get current page
     const page = $(".page_current")
       .eq(0)
