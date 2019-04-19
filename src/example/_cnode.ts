@@ -51,7 +51,7 @@ const spider = new Crawler(CNode, {
 
 spider.on("data", data => {
   const rows = data.items
-    .map(v => {
+    .map((v: { title: any; href: string }) => {
       return `[${v.title}](${domain.replace(/\/$/, "") + v.href})`;
     })
     .join("\n\n");

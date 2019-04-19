@@ -52,7 +52,7 @@ export class Scheduling extends EventEmitter {
 
     this.exec(task)
       .catch(err => {
-        this.emit("error", task, err);
+        this.emit("error", err, task);
       })
       .finally(() => {
         // remove running task

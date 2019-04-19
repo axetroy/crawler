@@ -46,13 +46,20 @@ class ScrapinghubProvider implements Provider {
   }
 }
 
-const spider = new Crawler(ScrapinghubProvider);
+const spider = new Crawler(ScrapinghubProvider, {
+  timeout: 1000 * 1,
+  retry: 3
+});
 
 let articles: string[] = [];
 
 spider.on("data", data => {
   articles = articles.concat(data);
   console.log(`Got '${data.length}' articles.`);
+});
+
+spider.on("error", (err, task) => {
+  console.log(`request fail on ${task.url}: ${err.message}`);
 });
 
 spider.on("finish", () => {

@@ -44,8 +44,8 @@ export class Crawler extends EventEmitter implements ICrawler {
     /**
      * it can re-run the task with this `this.scheduling.push(task);`
      */
-    this.scheduling.on("error", (task, err) => {
-      this.emit("error", task, err);
+    this.scheduling.on("error", (err, task) => {
+      this.emit("error", err, task);
     });
 
     this.scheduling.on("finish", () => {
@@ -90,9 +90,9 @@ export class Crawler extends EventEmitter implements ICrawler {
       retries: retry || 0,
       onFailedAttempt: error => {
         console.log(
-          `Attempt ${error.attemptNumber} failed. There are ${
-            error.retriesLeft
-          } retries left.`
+          `Attempt [${method}]: '${url}' ${
+            error.attemptNumber
+          } failed. There are ${error.retriesLeft} retries left.`
         );
         // 1st request => Attempt 1 failed. There are 4 retries left.
         // 2nd request => Attempt 2 failed. There are 3 retries left.
