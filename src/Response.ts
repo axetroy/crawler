@@ -11,7 +11,7 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   download(
     url: string,
     filepath: string,
-    options: download.DownloadOptions
+    options?: download.DownloadOptions
   ): Promise<void>;
   follow(url: string): void;
 }
@@ -40,7 +40,7 @@ export function CreateResponse(
   $.download = (
     url: string,
     filepath: string,
-    options: download.DownloadOptions
+    options?: download.DownloadOptions
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       // @ts-ignore

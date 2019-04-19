@@ -79,6 +79,7 @@ spider.start();
 
 - [基本的爬虫](https://github.com/axetroy/crawler/tree/master/examples/basic.ts)
 - [多个目标地址爬虫](https://github.com/axetroy/crawler/tree/master/examples/multiple-urls.ts)
+- [爬取资源图片](https://github.com/axetroy/crawler/tree/master/examples/resource-download.ts)
 
 ### 捐赠我
 
