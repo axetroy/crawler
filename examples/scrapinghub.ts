@@ -1,4 +1,4 @@
-import { Crawler, Provider, Response } from "../index";
+import { Crawler, Provider, Response } from "../src/index";
 
 class ScrapinghubProvider implements Provider {
   name = "scrapinghub";

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./crawler",
     "module": "commonjs",
     "target": "es5",
     "lib": ["es6", "dom"],
@@ -11,5 +10,5 @@
     "typeRoots": ["node_modules/@types", "typings"],
     "experimentalDecorators": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "examples"]
 }

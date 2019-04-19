@@ -1,6 +1,12 @@
 import { URL } from "url";
-import { Crawler, Provider, Response, Headers, Proxy } from "../index";
-import { RandomUserAgentProvider } from "../build-in";
+import {
+  Crawler,
+  Provider,
+  Response,
+  Headers,
+  Proxy,
+  RandomUserAgentProvider
+} from "../src/index";
 
 class V2EX implements Provider {
   name = "v2ex";

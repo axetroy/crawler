@@ -1,6 +1,5 @@
 import { URL } from "url";
-import { Crawler, Provider, Response } from "../index";
-import { RandomUserAgentProvider } from "../build-in";
+import { Crawler, Provider, Response, RandomUserAgentProvider } from "../src";
 
 class Baidu implements Provider {
   name = "baidu";
