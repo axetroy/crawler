@@ -7,8 +7,8 @@ import {
 
 const domain = "https://www.baidu.com";
 
-class ScrapinghubProvider implements Provider {
-  name = "scrapinghub";
+class BaiDuProvider implements Provider {
+  name = "baidu";
   urls = ["chrome", "firefox", "safari"].map(
     keyword => domain + "/s?wd=" + keyword
   );
@@ -26,7 +26,7 @@ class ScrapinghubProvider implements Provider {
   }
 }
 
-const spider = new Crawler(ScrapinghubProvider, {
+const spider = new Crawler(BaiDuProvider, {
   timeout: 1000 * 1,
   retry: 3,
   agent: RandomUserAgentProvider

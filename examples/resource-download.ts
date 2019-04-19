@@ -10,8 +10,8 @@ import {
 
 const domain = "http://sc.chinaz.com";
 
-class ScrapinghubProvider implements Provider {
-  name = "scrapinghub";
+class ChinaZProvider implements Provider {
+  name = "china-z";
   urls = ["/tupian/rentiyishu.html", "/tupian/renwutupian.html"].map(
     path => domain + path
   );
@@ -41,7 +41,7 @@ class ScrapinghubProvider implements Provider {
   }
 }
 
-const spider = new Crawler(ScrapinghubProvider, {
+const spider = new Crawler(ChinaZProvider, {
   timeout: 1000 * 1,
   retry: 3,
   agent: RandomUserAgentProvider
