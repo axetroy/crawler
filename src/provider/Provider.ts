@@ -1,5 +1,11 @@
+import { Stream } from "stream";
 import { Response } from "../_Response";
 import { Options } from "../Config";
+
+export type JSONPrimitive = string | number | boolean | null;
+export type JSONObject = { [key: string]: JSONValue };
+export interface JSONArray extends Array<JSONValue> {}
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 
 export type Method =
   | "GET"
@@ -12,7 +18,16 @@ export type Method =
   | "TRACE"
   | "PATCH";
 
-export type Body = string | Buffer | FormData | Uint8Array | null;
+export type Body =
+  | string
+  | JSONValue
+  | Buffer
+  | ArrayBuffer
+  | ArrayBufferView
+  | Uint8Array
+  | URLSearchParams
+  | Stream
+  | null;
 
 export interface UrlCustomer {
   url: string;
