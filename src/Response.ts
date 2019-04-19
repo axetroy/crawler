@@ -22,6 +22,7 @@ export function CreateResponse(response: AxiosResponse) {
   $.config = response.config;
   $.headers = response.headers;
   $.data = response.data;
+  $.request = response.request;
 
   $.download = (
     url: string,
