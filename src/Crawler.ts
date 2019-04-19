@@ -2,8 +2,11 @@ import { EventEmitter } from "events";
 import axios from "axios";
 import { Task, Scheduling } from "./_Scheduling";
 import { Options } from "./Config";
-import { CreateResponse } from "./Response";
+import { CreateResponse } from "./_Response";
 import { Provider, ProviderFactory } from "./provider/Provider";
+import { Agent } from "./provider/Agent";
+import { Proxy } from "./provider/Proxy";
+import { Headers } from "./provider/Headers";
 import * as pRetry from "p-retry";
 
 /**
@@ -22,9 +25,15 @@ export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
   private scheduling: Scheduling;
   private provider: Provider;
+  private agent: Agent;
+  private proxy: Proxy;
+  private headers: Headers;
   constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
     this.provider = new ProviderClass(options);
+    this.agent = options.agent ? new options.agent(options) : undefined;
+    this.proxy = options.proxy ? new options.proxy(options) : undefined;
+    this.headers = options.headers ? new options.headers(options) : undefined;
     const { concurrency } = this.options;
 
     this.scheduling = new Scheduling({ concurrency });
@@ -41,16 +50,20 @@ export class Crawler extends EventEmitter implements ICrawler {
     });
   }
   private async request(url: string, method: string): Promise<void> {
-    const { proxy, agent, logger, headers, timeout, retry } = this.options;
+    const { timeout, retry } = this.options;
 
     // resolve proxy
-    const _proxy = proxy ? await proxy.resolve(url, method) : false;
+    const _proxy = this.proxy ? await this.proxy.resolve(url, method) : false;
 
     // resolve useragent
-    const userAgent = agent ? await agent.resolve(url, method) : undefined;
+    const userAgent = this.agent
+      ? await this.agent.resolve(url, method)
+      : undefined;
 
     // resolve headers
-    const _headers = headers ? await headers.resolve(url, method) : {};
+    const _headers = this.headers
+      ? await this.headers.resolve(url, method)
+      : {};
 
     const request = async () => {
       return await http.request({
@@ -79,11 +92,6 @@ export class Crawler extends EventEmitter implements ICrawler {
         // …
       }
     });
-
-    // print to logger
-    if (logger) {
-      logger.log(url);
-    }
 
     const response = CreateResponse(httpResponse, this, this.scheduling);
 

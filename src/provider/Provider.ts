@@ -1,4 +1,4 @@
-import { Response } from "../Response";
+import { Response } from "../_Response";
 import { Options } from "../Config";
 
 export interface ProviderFactory {

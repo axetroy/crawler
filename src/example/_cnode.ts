@@ -46,12 +46,7 @@ const spider = new Crawler(CNode, {
   interval: 0,
   persistence: false,
   retry: 5,
-  agent: new RandomUserAgentProvider(),
-  logger: {
-    log(msg) {
-      console.log("[GET]: " + msg);
-    }
-  }
+  agent: RandomUserAgentProvider
 });
 
 spider.on("data", data => {

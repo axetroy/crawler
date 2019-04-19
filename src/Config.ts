@@ -1,7 +1,6 @@
-import { Agent } from "./provider/Agent";
-import { Proxy } from "./provider/Proxy";
-import { Logger } from "./provider/Logger";
-import { Headers } from "./provider/Header";
+import { AgentFactory } from "./provider/Agent";
+import { ProxyFactory } from "./provider/Proxy";
+import { HeadersFactory } from "./provider/Headers";
 
 export interface Options {
   /**
@@ -31,17 +30,13 @@ export interface Options {
   /**
    * The proxy provider.
    */
-  proxy?: Proxy;
+  proxy?: ProxyFactory;
   /**
    * The Usage-Agent provider.
    */
-  agent?: Agent;
+  agent?: AgentFactory;
   /**
    * The headers provider.
    */
-  headers?: Headers;
-  /**
-   * The logger provider.
-   */
-  logger?: Logger;
+  headers?: HeadersFactory;
 }

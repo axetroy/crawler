@@ -61,14 +61,9 @@ const spider = new Crawler(V2EX, {
   interval: 0,
   persistence: true,
   retry: 5,
-  agent: new RandomUserAgentProvider(),
-  headers: new MyHeaders(),
-  proxy: new MyProxy(),
-  logger: {
-    log(msg) {
-      console.log(msg);
-    }
-  }
+  agent: RandomUserAgentProvider,
+  headers: MyHeaders,
+  proxy: MyProxy
 });
 
 spider.on("data", data => {

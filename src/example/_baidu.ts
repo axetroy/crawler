@@ -44,7 +44,7 @@ const spider = new Crawler(Baidu, {
   interval: 0,
   persistence: true,
   retry: 5,
-  agent: new RandomUserAgentProvider()
+  agent: RandomUserAgentProvider
 });
 
 spider.on("data", data => {
