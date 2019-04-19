@@ -45,6 +45,10 @@ export class Crawler extends EventEmitter implements ICrawler {
       this.emit("error", task, err);
     });
 
+    this.scheduling.on("finish", () => {
+      this.emit("finish");
+    });
+
     this.scheduling.subscribe(async task => {
       await this.request(task.name, "GET");
     });

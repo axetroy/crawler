@@ -59,6 +59,9 @@ export class Scheduling extends EventEmitter {
         this.runningQueue.splice(currentTaskIndex, 1);
 
         if (this.nextable) this.next();
+        if (!this.pendingQueue.length && !this.runningQueue.length) {
+          this.emit("finish");
+        }
       });
   }
   /**
