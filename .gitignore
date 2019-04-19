@@ -65,3 +65,4 @@ package-lock.json
 .crawler.json
 dist
 docs
+./src/example/data/*
