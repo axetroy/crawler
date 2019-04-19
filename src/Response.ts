@@ -47,7 +47,7 @@ export function CreateResponse(
     });
   };
 
-  const { interval } = crawler.config;
+  const { interval } = crawler.options;
 
   // 跟着跳到下一个链接
   $.follow = (nextUrl: string) => {

@@ -22,7 +22,7 @@ export interface ICrawler {
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
   private _scheduling: Scheduling;
-  constructor(private provider: Provider, public options: Options) {
+  constructor(private provider: Provider, public options: Options = {}) {
     super();
     const { concurrency, timeout, retry } = this.options;
 

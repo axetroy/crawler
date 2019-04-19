@@ -27,33 +27,21 @@ npm install @axetroy/crawler
 ```typescript
 import { Crawler, Provider, Response } from "@axetroy/crawler";
 
-class MyProvider implements Provider {
-  name = "my provider"
-  // defined started url
-  urls = ["https://example/cate/1?page=1"];
-  // defined how to parse data
+class ScrapinghubProvider implements Provider {
+  name = "scrapinghub";
+  urls = ["https://blog.scrapinghub.com"];
   async parse($: Response) {
-    const url = new URL($.config.url);
-    // get current page
-    const page = $(".page_current")
-      .eq(0)
-      .text()
-      .trim();
+    const $nextPage = $("a.next-posts-link").eq(0);
 
-    // get 20 pages data
-    if (+page < 20) {
-      url.searchParams.delete("page");
-      url.searchParams.append("page", page + 1 + "");
-      $.follow(url.toString()); // return url to go next page
+    if ($nextPage) {
+      $.follow($nextPage.prop("href"));
     }
 
     return {
-      url: $.config.url,
-      items: $(".item_title a")
+      items: $(".post-header>h2")
         .map((i, el) => {
           return {
-            title: $(el).text(),
-            href: $(el).attr("href")
+            title: $(el).text()
           };
         })
         .get()
@@ -61,14 +49,12 @@ class MyProvider implements Provider {
   }
 }
 
-const spider = new Crawler(new MyProvider());
+const spider = new Crawler(new ScrapinghubProvider());
 
 spider.on("data", data => {
-  // here is the data you got.
   console.log(data);
 });
 
-// start
 spider.start();
 ```
 
