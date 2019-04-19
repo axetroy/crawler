@@ -11,7 +11,7 @@ class ScrapinghubProvider implements Provider {
     }
 
     return $(".post-header>h2")
-      .map((i, el) => $(el).text())
+      .map((_, el) => $(el).text())
       .get();
   }
 }
