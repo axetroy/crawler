@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 import axios from "axios";
 import pRetry from "p-retry";
+import pTimeout from "p-timeout";
 import { Task, Scheduler } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
@@ -80,7 +81,8 @@ export class Crawler extends EventEmitter implements ICrawler {
     method: Method = "GET",
     body?: Body
   ): Promise<void> {
-    const { timeout, retry } = this.options;
+    const { retry } = this.options;
+    const httpTimeout = this.options.timeout || 60 * 1000;
 
     const [proxy, userAgent, headers, auth] = await Promise.all([
       this.proxy ? await this.proxy.resolve(url, method, body) : undefined,
@@ -96,11 +98,11 @@ export class Crawler extends EventEmitter implements ICrawler {
     const request = async () => {
       const t1 = performance.now();
       logger.info(`[${method}]: ${url}`);
-      const response = await await http.request({
+      const p = http.request({
         url,
         method,
         proxy,
-        timeout,
+        timeout: httpTimeout,
         data: body,
         auth,
         headers: {
@@ -109,6 +111,11 @@ export class Crawler extends EventEmitter implements ICrawler {
         },
         cancelToken: source.token
       });
+      const response = await pTimeout(
+        p,
+        httpTimeout,
+        `[${method}]: ${url} timeout of '${httpTimeout}' ms`
+      );
       const t2 = performance.now();
       httpTakeTime = t2 - t1;
       logger.info(`[${method}]: ${url} ${httpTakeTime} ms`);
