@@ -7,6 +7,8 @@ import { Provider, ProviderFactory } from "./Provider";
 import { Method, Body, createResponse } from "./Http";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 
+const cancelSource = axios.CancelToken.source();
+
 /**
  * @ignore
  */
@@ -85,7 +87,8 @@ export class Crawler extends EventEmitter implements ICrawler {
         headers: {
           ...headers,
           ...(userAgent ? { "User-Agent": userAgent } : {})
-        }
+        },
+        cancelSource: cancelSource.token
       });
     };
 
@@ -128,6 +131,7 @@ export class Crawler extends EventEmitter implements ICrawler {
   public stop() {
     this.active = false;
     if (this.scheduler) {
+      cancelSource.cancel("Operation canceled by the user.");
       this.scheduler.clear();
     }
   }
