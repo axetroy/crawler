@@ -1,9 +1,4 @@
-import {
-  Crawler,
-  Provider,
-  Response,
-  RandomUserAgentProvider
-} from "../src/index";
+import { Crawler, Provider, Response, buildIn } from "../src/index";
 
 const domain = "https://www.baidu.com";
 
@@ -29,7 +24,7 @@ class BaiDuProvider implements Provider {
 const spider = new Crawler(BaiDuProvider, {
   timeout: 1000 * 1,
   retry: 3,
-  UserAgent: RandomUserAgentProvider
+  UserAgent: buildIn.provider.RandomUserAgent
 });
 
 spider.on("data", (resultList: string[]) => {

@@ -1,12 +1,7 @@
 import * as URL from "url";
 import * as fs from "fs-extra";
 import * as path from "path";
-import {
-  Crawler,
-  Provider,
-  Response,
-  RandomUserAgentProvider
-} from "../src/index";
+import { Crawler, Provider, Response, buildIn } from "../src/index";
 
 const domain = "http://sc.chinaz.com";
 
@@ -44,7 +39,7 @@ class ChinaZProvider implements Provider {
 const spider = new Crawler(ChinaZProvider, {
   timeout: 1000 * 1,
   retry: 3,
-  UserAgent: RandomUserAgentProvider
+  UserAgent: buildIn.provider.RandomUserAgent
 });
 
 spider.on("data", (resultList: string[]) => {

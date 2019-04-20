@@ -1,1 +1,3 @@
-export * from "./RandomUaProvider";
+import * as provider from "./provider";
+
+export { provider };

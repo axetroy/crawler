@@ -1,10 +1,10 @@
-import { UserAgent } from "../agent/UserAgent";
+import { UserAgent } from "../../agent/UserAgent";
 
 /**
  * Build-in Agent provider.
  * Set random `Usage-Agent` for every request.
  */
-export class RandomUserAgentProvider implements UserAgent {
+export class RandomUserAgent implements UserAgent {
   /**
    * Resolve random `Usage-Agent`
    */
