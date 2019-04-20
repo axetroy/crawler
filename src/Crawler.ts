@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { performance } from "perf_hooks";
 import axios from "axios";
 import pRetry from "p-retry";
 import { Task, Scheduler } from "./Scheduler";
@@ -7,6 +8,7 @@ import { Provider, ProviderFactory } from "./Provider";
 import { Method, Body, createResponse } from "./Http";
 import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
+import { logger } from "./Logger";
 
 const source = axios.CancelToken.source();
 
@@ -89,8 +91,12 @@ export class Crawler extends EventEmitter implements ICrawler {
       this.auth ? await this.auth.resolve(url, method, body) : undefined
     ]);
 
+    let httpTakeTime = 0;
+
     const request = async () => {
-      return await http.request({
+      const t1 = performance.now();
+      logger.info(`[${method}]: ${url}`);
+      const response = await await http.request({
         url,
         method,
         proxy,
@@ -103,13 +109,17 @@ export class Crawler extends EventEmitter implements ICrawler {
         },
         cancelToken: source.token
       });
+      const t2 = performance.now();
+      httpTakeTime = t2 - t1;
+      logger.info(`[${method}]: ${url} ${httpTakeTime} ms`);
+      return response;
     };
 
     // send request
     const httpResponse = await pRetry(request, {
       retries: retry || 0,
       onFailedAttempt: error => {
-        console.log(
+        logger.error(
           `Attempt [${method}]: '${url}' ${
             error.attemptNumber
           } failed. There are ${error.retriesLeft} retries left.`
@@ -121,6 +131,7 @@ export class Crawler extends EventEmitter implements ICrawler {
     });
 
     const response = createResponse(httpResponse, this, this.scheduler);
+    response.times = httpTakeTime;
 
     // parse response
     const data = await this.provider.parse(response);
@@ -133,7 +144,7 @@ export class Crawler extends EventEmitter implements ICrawler {
     if (this.persistence) {
       const loadSuccess = this.persistence.load();
       if (loadSuccess) {
-        console.log(
+        logger.info(
           `Continue to the last spider from '${this.persistence.TaskFilePath}'`
         );
         return;

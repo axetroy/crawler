@@ -33,11 +33,14 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.3",
+    "date-fns": "^1.30.1",
     "download": "^7.1.0",
     "fs-extra": "^7.0.1",
     "modern-random-ua": "^1.0.3",
     "p-retry": "^4.1.0",
-    "p-timeout": "^3.1.0"
+    "p-timeout": "^3.1.0",
+    "winston": "^3.2.1"
   }
 }

@@ -43,6 +43,7 @@ export interface UrlCustomer {
 export type Url = string | UrlCustomer;
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
+  times: number;
   download(
     url: string,
     filepath: string,
