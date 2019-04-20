@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 import * as download from "download";
 import * as fs from "fs-extra";
 import { ICrawler } from "./Crawler";
-import { Scheduling, Task } from "./Scheduler";
+import { Scheduler, Task } from "./Scheduler";
 import { sleep } from "./utils";
 
 export type JSONPrimitive = string | number | boolean | null;
@@ -54,7 +54,7 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
 export function createResponse(
   response: AxiosResponse,
   crawler: ICrawler,
-  scheduling: Scheduling
+  scheduler: Scheduler
 ): Response {
   /**
    * jQuery selector
@@ -100,9 +100,9 @@ export function createResponse(
           ? new Task(nextUrl)
           : new Task(nextUrl.url, nextUrl.method, nextUrl.body);
       if (interval) {
-        sleep(interval).then(() => scheduling.push(task));
+        sleep(interval).then(() => scheduler.push(task));
       } else {
-        scheduling.push(task);
+        scheduler.push(task);
       }
     }
   };

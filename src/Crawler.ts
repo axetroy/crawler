@@ -1,10 +1,11 @@
 import { EventEmitter } from "events";
 import axios from "axios";
 import pRetry from "p-retry";
-import { Task, Scheduling } from "./Scheduler";
+import { Task, Scheduler } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
 import { Method, Body, createResponse } from "./Http";
+import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 
 const source = axios.CancelToken.source();
@@ -23,12 +24,13 @@ export interface ICrawler {
 
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
-  private scheduler: Scheduling;
+  private scheduler: Scheduler;
   private provider: Provider;
   private userAgent: UserAgent;
   private proxy: Proxy;
   private headers: Headers;
   private auth: Auth;
+  private persistence: Persistence;
   constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
     this.provider = new ProviderClass(options);
@@ -40,7 +42,14 @@ export class Crawler extends EventEmitter implements ICrawler {
     this.auth = options.Auth ? new options.Auth(options) : undefined;
     const { concurrency } = this.options;
 
-    this.scheduler = new Scheduling({ concurrency });
+    const getPersistenceFn = options.persistence
+      ? () => this.persistence
+      : undefined;
+
+    this.scheduler = new Scheduler({
+      concurrency,
+      persistenceFn: getPersistenceFn
+    });
 
     /**
      * it can re-run the task with this `this.scheduler.push(task);`
@@ -59,6 +68,10 @@ export class Crawler extends EventEmitter implements ICrawler {
     this.scheduler.subscribe(async task => {
       await this.request(task.url, task.method, task.body);
     });
+
+    this.persistence = options.persistence
+      ? new Persistence(this.scheduler)
+      : undefined;
   }
   private async request(
     url: string,
@@ -117,6 +130,15 @@ export class Crawler extends EventEmitter implements ICrawler {
    * start crawl
    */
   public start() {
+    if (this.persistence) {
+      const loadSuccess = this.persistence.load();
+      if (loadSuccess) {
+        console.log(
+          `Continue to the last spider from '${this.persistence.TaskFilePath}'`
+        );
+        return;
+      }
+    }
     for (const url of this.provider.urls) {
       if (typeof url === "string") {
         this.scheduler.push(new Task(url));

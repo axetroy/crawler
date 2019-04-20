@@ -1,9 +1,10 @@
 import { EventEmitter } from "events";
 import { Method, Body } from "./Http";
+import { Persistence } from "./Persistence";
 
 let id = 0;
 
-export class Task<T> {
+export class Task {
   public id: number;
   constructor(public url: string, public method?: Method, public body?: Body) {
     this.id = ++id;
@@ -12,13 +13,14 @@ export class Task<T> {
 
 export interface Options {
   concurrency?: number;
+  persistenceFn?(): Persistence;
 }
 
-type SubscribeFn = (task: Task<any>) => Promise<void>;
+type SubscribeFn = (task: Task) => Promise<void>;
 
-export class Scheduling extends EventEmitter {
-  private pendingQueue: Task<any>[] = []; // The pendding queue
-  private runningQueue: Task<any>[] = []; // The running queue
+export class Scheduler extends EventEmitter {
+  private pendingQueue: Task[] = []; // The pendding queue
+  private runningQueue: Task[] = []; // The running queue
   private subscriptions: SubscribeFn[] = []; // The subscription
   constructor(private options: Options = {}) {
     super();
@@ -28,7 +30,7 @@ export class Scheduling extends EventEmitter {
    * execute a task
    * @param task a task to execute
    */
-  private exec<T>(task: Task<T>): Promise<void> {
+  private exec(task: Task): Promise<void> {
     const link = this.subscriptions.reduce((prev, current) => {
       return prev.then(() => current(task));
     }, Promise.resolve());
@@ -46,6 +48,15 @@ export class Scheduling extends EventEmitter {
   private get nextable() {
     return this.pendingQueue.length && !this.isBusy;
   }
+  private sync() {
+    const { persistenceFn } = this.options;
+    if (persistenceFn) {
+      const persistence = persistenceFn();
+      if (persistence) {
+        persistence.sync(this.runningQueue.concat(this.pendingQueue));
+      }
+    }
+  }
   /**
    * Go to the next task
    */
@@ -55,6 +66,8 @@ export class Scheduling extends EventEmitter {
     const task = this.pendingQueue.shift();
 
     this.runningQueue.push(task);
+
+    this.sync();
 
     this.exec(task)
       .catch(err => {
@@ -69,7 +82,15 @@ export class Scheduling extends EventEmitter {
         if (!this.pendingQueue.length && !this.runningQueue.length) {
           this.emit("finish");
         }
+        this.sync();
       });
+  }
+  /**
+   * Set current id for the task
+   * @param initializationId
+   */
+  public setCurrentId(initializationId: number) {
+    id = initializationId || 0;
   }
   /**
    * Subscribe the task
@@ -82,7 +103,7 @@ export class Scheduling extends EventEmitter {
    * Push a new task to the pool
    * @param task a new task
    */
-  public push(task: Task<any>) {
+  public push(task: Task) {
     this.pendingQueue.push(task);
     if (this.nextable) this.next();
   }

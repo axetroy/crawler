@@ -68,3 +68,4 @@ docs
 ./src/example/data/*
 
 .DS_Store
+.crawler
