@@ -5,7 +5,7 @@
 
 ### Nodejs 的爬虫框架
 
-为了实现快速开发爬虫而写的框架。
+一个快速，简单，易用的 nodejs 爬虫框架.
 
 > WARNING: 当前仍处于开发阶段，任何存在的特性都可能会更改或者移除
 
@@ -21,7 +21,7 @@
 - [x] 自定义 HTTP 方法、请求体
 - [x] 错误重试
 
-### Usage
+### 快速开始
 
 ```bash
 npm install @axetroy/crawler
