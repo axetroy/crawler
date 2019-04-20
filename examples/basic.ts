@@ -21,11 +21,10 @@ const spider = new Crawler(ScrapinghubProvider, {
   retry: 3
 });
 
-let articles: string[] = [];
-
-spider.on("data", data => {
-  articles = articles.concat(data);
-  console.log(`Got '${data.length}' articles.`);
+spider.on("data", (articles: string[]) => {
+  for (const article of articles) {
+    process.stdout.write(article + "\n");
+  }
 });
 
 spider.on("error", (err, task) => {
@@ -33,7 +32,7 @@ spider.on("error", (err, task) => {
 });
 
 spider.on("finish", () => {
-  console.log(articles);
+  process.stdout.write("finish...\n");
 });
 
 spider.start();
