@@ -4,8 +4,8 @@ import pRetry from "p-retry";
 import { Task, Scheduling } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
-import { Agent, Proxy, Headers, Auth } from "./agent";
 import { Method, Body, createResponse } from "./Http";
+import { Agent, Proxy, Headers, Auth } from "./agent";
 
 /**
  * @ignore
