@@ -65,18 +65,20 @@ export class Crawler extends EventEmitter implements ICrawler {
   ): Promise<void> {
     const { timeout, retry } = this.options;
 
-    const [_proxy, userAgent, headers, auth] = await Promise.all([
-      this.proxy ? await this.proxy.resolve(url, method) : undefined,
-      this.userAgent ? await this.userAgent.resolve(url, method) : undefined,
-      this.headers ? await this.headers.resolve(url, method) : {},
-      this.auth ? await this.auth.resolve(url, method) : undefined
+    const [proxy, userAgent, headers, auth] = await Promise.all([
+      this.proxy ? await this.proxy.resolve(url, method, body) : undefined,
+      this.userAgent
+        ? await this.userAgent.resolve(url, method, body)
+        : undefined,
+      this.headers ? await this.headers.resolve(url, method, body) : {},
+      this.auth ? await this.auth.resolve(url, method, body) : undefined
     ]);
 
     const request = async () => {
       return await http.request({
         url,
         method,
-        proxy: _proxy,
+        proxy,
         timeout,
         data: body,
         auth,
