@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { Method, Body } from "./provider/Provider";
+import { Method, Body } from "./Http";
 
 let id = 0;
 
@@ -34,9 +34,15 @@ export class Scheduling extends EventEmitter {
     }, Promise.resolve());
     return link;
   }
+  /**
+   * Is the scheduler busy?
+   */
   private get isBusy(): boolean {
     return this.runningQueue.length >= this.options.concurrency;
   }
+  /**
+   * Is the scheduler can go to next task?
+   */
   private get nextable() {
     return this.pendingQueue.length && !this.isBusy;
   }

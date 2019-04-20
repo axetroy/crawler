@@ -1,41 +1,5 @@
-import { Stream } from "stream";
-import { Response } from "../Response";
-import { Options } from "../Config";
-
-export type JSONPrimitive = string | number | boolean | null;
-export type JSONObject = { [key: string]: JSONValue };
-export interface JSONArray extends Array<JSONValue> {}
-export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
-
-export type Method =
-  | "GET"
-  | "HEAD"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "CONNECT"
-  | "OPTIONS"
-  | "TRACE"
-  | "PATCH";
-
-export type Body =
-  | string
-  | JSONValue
-  | Buffer
-  | ArrayBuffer
-  | ArrayBufferView
-  | Uint8Array
-  | URLSearchParams
-  | Stream
-  | null;
-
-export interface UrlCustomer {
-  url: string;
-  method?: Method;
-  body?: Body;
-}
-
-export type Url = string | UrlCustomer;
+import { Options } from "../Option";
+import { Url, Response } from "../Http";
 
 export interface ProviderFactory {
   new (options?: Options): Provider;

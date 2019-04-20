@@ -1,4 +1,4 @@
-import { Options } from "../Config";
+import { Options } from "../Option";
 export interface AgentFactory {
   new (options?: Options): Agent;
 }

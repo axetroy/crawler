@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import { Task } from "./Scheduling";
+import { Task } from "./Scheduler";
 import { crawlerFilepath } from "./Constant";
 
 export class Persistence {

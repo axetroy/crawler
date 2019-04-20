@@ -1,14 +1,14 @@
 import { EventEmitter } from "events";
 import axios from "axios";
-import { Task, Scheduling } from "./Scheduling";
-import { Options } from "./Config";
-import { CreateResponse } from "./Response";
-import { Provider, ProviderFactory, Method, Body } from "./provider/Provider";
+import pRetry from "p-retry";
+import { Task, Scheduling } from "./Scheduler";
+import { Options } from "./Option";
+import { Provider, ProviderFactory } from "./provider/Provider";
 import { Agent } from "./provider/Agent";
 import { Proxy } from "./provider/Proxy";
 import { Headers } from "./provider/Headers";
 import { Auth } from "./provider/Auth";
-import pRetry from "p-retry";
+import { Method, Body, createResponse } from "./Http";
 
 /**
  * @ignore
@@ -24,7 +24,7 @@ export interface ICrawler {
 
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
-  private scheduling: Scheduling;
+  private scheduler: Scheduling;
   private provider: Provider;
   private agent: Agent;
   private proxy: Proxy;
@@ -39,23 +39,23 @@ export class Crawler extends EventEmitter implements ICrawler {
     this.auth = options.auth ? new options.auth(options) : undefined;
     const { concurrency } = this.options;
 
-    this.scheduling = new Scheduling({ concurrency });
+    this.scheduler = new Scheduling({ concurrency });
 
     /**
-     * it can re-run the task with this `this.scheduling.push(task);`
+     * it can re-run the task with this `this.scheduler.push(task);`
      */
-    this.scheduling.on("error", (err, task) => {
+    this.scheduler.on("error", (err, task) => {
       this.emit("error", err, task);
     });
 
     /**
      * Where there is no task to do
      */
-    this.scheduling.on("finish", () => {
+    this.scheduler.on("finish", () => {
       this.emit("finish");
     });
 
-    this.scheduling.subscribe(async task => {
+    this.scheduler.subscribe(async task => {
       await this.request(task.url, task.method, task.body);
     });
   }
@@ -103,7 +103,7 @@ export class Crawler extends EventEmitter implements ICrawler {
       }
     });
 
-    const response = CreateResponse(httpResponse, this, this.scheduling);
+    const response = createResponse(httpResponse, this, this.scheduler);
 
     // parse response
     const data = await this.provider.parse(response);
@@ -115,9 +115,9 @@ export class Crawler extends EventEmitter implements ICrawler {
   public start() {
     for (const url of this.provider.urls) {
       if (typeof url === "string") {
-        this.scheduling.push(new Task(url));
+        this.scheduler.push(new Task(url));
       } else {
-        this.scheduling.push(new Task(url.url, url.method, url.body));
+        this.scheduler.push(new Task(url.url, url.method, url.body));
       }
     }
   }
@@ -126,8 +126,8 @@ export class Crawler extends EventEmitter implements ICrawler {
    */
   public stop() {
     this.active = false;
-    if (this.scheduling) {
-      this.scheduling.clear();
+    if (this.scheduler) {
+      this.scheduler.clear();
     }
   }
 }

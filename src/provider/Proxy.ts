@@ -1,5 +1,5 @@
 import { AxiosProxyConfig } from "axios";
-import { Options } from "../Config";
+import { Options } from "../Option";
 
 export interface ProxyFactory {
   new (options: Options): Proxy;

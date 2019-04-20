@@ -1,5 +1,5 @@
 import { IncomingHttpHeaders } from "http";
-import { Options } from "../Config";
+import { Options } from "../Option";
 
 export interface HeadersFactory {
   new (options: Options): Headers;

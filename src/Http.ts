@@ -1,11 +1,46 @@
+import { Stream } from "stream";
 import { AxiosResponse } from "axios";
 import * as cheerio from "cheerio";
 import * as download from "download";
 import * as fs from "fs-extra";
 import { ICrawler } from "./Crawler";
-import { Url } from "./provider/Provider";
-import { Scheduling, Task } from "./Scheduling";
+import { Scheduling, Task } from "./Scheduler";
 import { sleep } from "./utils";
+
+export type JSONPrimitive = string | number | boolean | null;
+export type JSONObject = { [key: string]: JSONValue };
+export interface JSONArray extends Array<JSONValue> {}
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
+
+export type Method =
+  | "GET"
+  | "HEAD"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "CONNECT"
+  | "OPTIONS"
+  | "TRACE"
+  | "PATCH";
+
+export type Body =
+  | string
+  | JSONValue
+  | Buffer
+  | ArrayBuffer
+  | ArrayBufferView
+  | Uint8Array
+  | URLSearchParams
+  | Stream
+  | null;
+
+export interface UrlCustomer {
+  url: string;
+  method?: Method;
+  body?: Body;
+}
+
+export type Url = string | UrlCustomer;
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   download(
@@ -16,7 +51,7 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   follow(url: string): void;
 }
 
-export function CreateResponse(
+export function createResponse(
   response: AxiosResponse,
   crawler: ICrawler,
   scheduling: Scheduling
