@@ -17,7 +17,7 @@ export interface Options {
    */
   interval?: number;
   /**
-   * The timeout of each request. Default: `0` ms. no timeout.
+   * The timeout of each request. Default: `60 * 1000` ms.
    */
   timeout?: number;
   /**
