@@ -10,6 +10,7 @@ import { Method, Body, createResponse } from "./Http";
 import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./Logger";
+import { sleep } from "./utils";
 
 const source = axios.CancelToken.source();
 
@@ -143,6 +144,10 @@ export class Crawler extends EventEmitter implements ICrawler {
     // parse response
     const data = await this.provider.parse(response);
     this.emit("data", data);
+
+    if (this.options.interval) {
+      await sleep(this.options.interval);
+    }
   }
   /**
    * start crawl

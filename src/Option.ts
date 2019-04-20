@@ -13,7 +13,7 @@ export interface Options {
    */
   headless?: boolean;
   /**
-   * The interval between each loop. Default: `0`.
+   * The interval between after request done. let it take a rest. Default: `0`.
    */
   interval?: number;
   /**

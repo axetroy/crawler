@@ -5,7 +5,6 @@ import * as download from "download";
 import * as fs from "fs-extra";
 import { ICrawler } from "./Crawler";
 import { Scheduler, Task } from "./Scheduler";
-import { sleep } from "./utils";
 
 export type JSONPrimitive = string | number | boolean | null;
 export type JSONObject = { [key: string]: JSONValue };
@@ -58,7 +57,11 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
     filepath: string,
     options?: download.DownloadOptions
   ): Promise<void>;
-  follow(url: string): void;
+  /**
+   * Go to the next url
+   * @param Url
+   */
+  follow(url: Url): void;
 }
 
 export function createResponse(
@@ -107,8 +110,6 @@ export function createResponse(
     });
   };
 
-  const { interval } = crawler.options;
-
   // 跟着跳到下一个链接
   $.follow = (nextUrl: Url) => {
     if (crawler.active && nextUrl) {
@@ -116,11 +117,7 @@ export function createResponse(
         typeof nextUrl === "string"
           ? new Task(nextUrl)
           : new Task(nextUrl.url, nextUrl.method, nextUrl.body);
-      if (interval) {
-        sleep(interval).then(() => scheduler.push(task));
-      } else {
-        scheduler.push(task);
-      }
+      scheduler.push(task);
     }
   };
 
