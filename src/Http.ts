@@ -43,7 +43,16 @@ export interface UrlCustomer {
 export type Url = string | UrlCustomer;
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
+  /**
+   * How many times(ms) it takes.
+   */
   times: number;
+  /**
+   * Download the resource
+   * @param url The resource url
+   * @param filepath The filepath which is the resource downloaded
+   * @param options
+   */
   download(
     url: string,
     filepath: string,
@@ -79,8 +88,15 @@ export function createResponse(
     options?: download.DownloadOptions
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
+      const _proxy = response.config.proxy;
+      const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
+      const _options: download.DownloadOptions = {
+        headers: response.config.headers,
+        proxy,
+        ...(options || {})
+      };
       // @ts-ignore
-      download(url, undefined, options)
+      download(url, undefined, _options)
         .pipe(fs.createWriteStream(filepath))
         .once("error", err => {
           reject(err);
