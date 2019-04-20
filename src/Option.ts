@@ -1,4 +1,4 @@
-import { AgentFactory } from "./agent/Agent";
+import { AgentFactory } from "./agent/UserAgent";
 import { ProxyFactory } from "./agent/Proxy";
 import { HeadersFactory } from "./agent/Headers";
 import { AuthFactory } from "./agent/Auth";
