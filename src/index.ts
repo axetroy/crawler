@@ -1,5 +1,6 @@
 export * from "./Crawler";
 export * from "./Http";
 export * from "./Option";
+export * from "./Provider";
 export * from "./build-in";
-export * from "./provider";
+export * from "./agent";

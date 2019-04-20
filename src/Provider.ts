@@ -1,5 +1,5 @@
-import { Options } from "../Option";
-import { Url, Response } from "../Http";
+import { Options } from "./Option";
+import { Url, Response } from "./Http";
 
 export interface ProviderFactory {
   new (options?: Options): Provider;

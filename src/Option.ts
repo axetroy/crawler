@@ -1,7 +1,7 @@
-import { AgentFactory } from "./provider/Agent";
-import { ProxyFactory } from "./provider/Proxy";
-import { HeadersFactory } from "./provider/Headers";
-import { AuthFactory } from "./provider/Auth";
+import { AgentFactory } from "./agent/Agent";
+import { ProxyFactory } from "./agent/Proxy";
+import { HeadersFactory } from "./agent/Headers";
+import { AuthFactory } from "./agent/Auth";
 
 export interface Options {
   /**

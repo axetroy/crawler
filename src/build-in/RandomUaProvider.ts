@@ -1,4 +1,4 @@
-import { Agent } from "../provider/Agent";
+import { Agent } from "../agent/Agent";
 
 /**
  * Build-in Agent provider.
