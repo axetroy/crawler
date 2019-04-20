@@ -31,17 +31,17 @@ export interface Options {
   /**
    * The proxy provider.
    */
-  proxy?: ProxyFactory;
+  Proxy?: ProxyFactory;
   /**
    * The Usage-Agent provider.
    */
-  agent?: AgentFactory;
+  UserAgent?: AgentFactory;
   /**
    * The headers provider.
    */
-  headers?: HeadersFactory;
+  Headers?: HeadersFactory;
   /**
    * The auth provider.
    */
-  auth?: AuthFactory;
+  Auth?: AuthFactory;
 }

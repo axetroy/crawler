@@ -1,7 +1,7 @@
 import { Options } from "../Option";
 export interface AgentFactory {
-  new (options?: Options): Agent;
+  new (options?: Options): UserAgent;
 }
-export interface Agent {
+export interface UserAgent {
   resolve(url: string, method: string): Promise<string | false>;
 }

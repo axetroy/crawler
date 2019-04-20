@@ -5,7 +5,7 @@ import { Task, Scheduling } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
 import { Method, Body, createResponse } from "./Http";
-import { Agent, Proxy, Headers, Auth } from "./agent";
+import { UserAgent, Proxy, Headers, Auth } from "./agent";
 
 /**
  * @ignore
@@ -23,17 +23,19 @@ export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
   private scheduler: Scheduling;
   private provider: Provider;
-  private agent: Agent;
+  private userAgent: UserAgent;
   private proxy: Proxy;
   private headers: Headers;
   private auth: Auth;
   constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
     this.provider = new ProviderClass(options);
-    this.agent = options.agent ? new options.agent(options) : undefined;
-    this.proxy = options.proxy ? new options.proxy(options) : undefined;
-    this.headers = options.headers ? new options.headers(options) : undefined;
-    this.auth = options.auth ? new options.auth(options) : undefined;
+    this.userAgent = options.UserAgent
+      ? new options.UserAgent(options)
+      : undefined;
+    this.proxy = options.Proxy ? new options.Proxy(options) : undefined;
+    this.headers = options.Headers ? new options.Headers(options) : undefined;
+    this.auth = options.Auth ? new options.Auth(options) : undefined;
     const { concurrency } = this.options;
 
     this.scheduler = new Scheduling({ concurrency });
@@ -65,7 +67,7 @@ export class Crawler extends EventEmitter implements ICrawler {
 
     const [_proxy, userAgent, headers, auth] = await Promise.all([
       this.proxy ? await this.proxy.resolve(url, method) : undefined,
-      this.agent ? await this.agent.resolve(url, method) : undefined,
+      this.userAgent ? await this.userAgent.resolve(url, method) : undefined,
       this.headers ? await this.headers.resolve(url, method) : {},
       this.auth ? await this.auth.resolve(url, method) : undefined
     ]);
