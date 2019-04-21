@@ -47,9 +47,9 @@ class ChinaZProvider implements Provider {
 }
 
 const spider = new Crawler(ChinaZProvider, {
-  concurrency: 5,
+  concurrency: 3,
   timeout: 1000 * 1,
-  retry: 3,
+  retry: 10,
   UserAgent: buildIn.provider.RandomUserAgent
 });
 
