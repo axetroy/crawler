@@ -50,13 +50,8 @@ const spider = new Crawler(ChinaZProvider, {
   concurrency: 3,
   timeout: 1000 * 1,
   retry: 10,
+  interval: 1000,
   UserAgent: buildIn.provider.RandomUserAgent
-});
-
-spider.on("data", (resultList: string[]) => {
-  for (const result of resultList) {
-    console.log("downloading...", result);
-  }
 });
 
 spider.on("error", (err, task) => {

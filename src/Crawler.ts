@@ -1,23 +1,12 @@
 import { EventEmitter } from "events";
-import { performance } from "perf_hooks";
-import axios from "axios";
-import pRetry from "p-retry";
-import pTimeout from "p-timeout";
 import { Task, Scheduler } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
-import { Method, Body, createResponse } from "./Http";
+import { Http, Method, Body } from "./Http";
 import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./Logger";
 import { sleep } from "./utils";
-
-const source = axios.CancelToken.source();
-
-/**
- * @ignore
- */
-const http = axios.create();
 
 export interface ICrawler {
   active: boolean;
@@ -28,16 +17,22 @@ export interface ICrawler {
 
 export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
-  private scheduler: Scheduler;
-  private provider: Provider;
-  private userAgent: UserAgent;
-  private proxy: Proxy;
-  private headers: Headers;
-  private auth: Auth;
-  private persistence: Persistence;
+  public scheduler: Scheduler;
+  public provider: Provider;
+  public userAgent: UserAgent;
+  public proxy: Proxy;
+  public headers: Headers;
+  public auth: Auth;
+  public persistence: Persistence;
+  public http: Http;
   constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
+    // init config
+    options.timeout = options.timeout || 1000 * 60;
+    options.retry = options.retry || 0;
+
     this.provider = new ProviderClass(options);
+    this.http = new Http(this);
     this.userAgent = options.UserAgent
       ? new options.UserAgent(options)
       : undefined;
@@ -70,7 +65,7 @@ export class Crawler extends EventEmitter implements ICrawler {
     });
 
     this.scheduler.subscribe(async task => {
-      await this.request(task.url, task.method, task.body);
+      return await this.request(task.url, task.method, task.body);
     });
 
     this.persistence = options.persistence
@@ -79,68 +74,10 @@ export class Crawler extends EventEmitter implements ICrawler {
   }
   private async request(
     url: string,
-    method: Method = "GET",
+    method: Method,
     body?: Body
   ): Promise<void> {
-    const { retry } = this.options;
-    const httpTimeout = this.options.timeout || 60 * 1000;
-
-    const [proxy, userAgent, headers, auth] = await Promise.all([
-      this.proxy ? await this.proxy.resolve(url, method, body) : undefined,
-      this.userAgent
-        ? await this.userAgent.resolve(url, method, body)
-        : undefined,
-      this.headers ? await this.headers.resolve(url, method, body) : {},
-      this.auth ? await this.auth.resolve(url, method, body) : undefined
-    ]);
-
-    let httpTakeTime = 0;
-
-    const request = async () => {
-      const t1 = performance.now();
-      logger.info(`[${method}]: ${url}`);
-      const p = http.request({
-        url,
-        method,
-        proxy,
-        timeout: httpTimeout,
-        data: body,
-        auth,
-        headers: {
-          ...headers,
-          ...(userAgent ? { "User-Agent": userAgent } : {})
-        },
-        cancelToken: source.token
-      });
-      const response = await pTimeout(
-        p,
-        httpTimeout,
-        `[${method}]: ${url} timeout of '${httpTimeout}' ms`
-      );
-      const t2 = performance.now();
-      httpTakeTime = t2 - t1;
-      logger.info(`[${method}]: ${url} ${httpTakeTime} ms`);
-      return response;
-    };
-
-    // send request
-    const httpResponse = await pRetry(request, {
-      retries: retry || 0,
-      onFailedAttempt: error => {
-        logger.error(
-          `Attempt [${method}]: '${url}' ${
-            error.attemptNumber
-          } failed. There are ${error.retriesLeft} retries left.`
-        );
-        // 1st request => Attempt 1 failed. There are 4 retries left.
-        // 2nd request => Attempt 2 failed. There are 3 retries left.
-        // …
-      }
-    });
-
-    const response = createResponse(httpResponse, this, this.scheduler);
-    response.times = httpTakeTime;
-
+    const response = await this.http.request(url, method, body);
     // parse response
     const data = await this.provider.parse(response);
     this.emit("data", data);
@@ -176,7 +113,7 @@ export class Crawler extends EventEmitter implements ICrawler {
   public stop() {
     this.active = false;
     if (this.scheduler) {
-      source.cancel("Operation canceled by the user.");
+      this.http.cancel();
       this.scheduler.clear();
     }
   }

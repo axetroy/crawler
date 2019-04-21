@@ -1,10 +1,14 @@
 import { Stream } from "stream";
-import { AxiosResponse } from "axios";
+import { performance } from "perf_hooks";
+import axios, { AxiosResponse } from "axios";
 import * as cheerio from "cheerio";
 import * as download from "download";
+import pRetry from "p-retry";
+import pTimeout from "p-timeout";
 import * as fs from "fs-extra";
-import { ICrawler } from "./Crawler";
-import { Scheduler, Task } from "./Scheduler";
+import { Crawler } from "./Crawler";
+import { Task } from "./Scheduler";
+import { logger } from "./Logger";
 
 export type JSONPrimitive = string | number | boolean | null;
 export type JSONObject = { [key: string]: JSONValue };
@@ -43,6 +47,10 @@ export type Url = string | UrlCustomer;
 
 export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   /**
+   * The crawler instance.
+   */
+  crawler: Crawler;
+  /**
    * How many times(ms) it takes.
    */
   times: number;
@@ -64,62 +72,127 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
   follow(url: Url): void;
 }
 
-export function createResponse(
-  response: AxiosResponse,
-  crawler: ICrawler,
-  scheduler: Scheduler
-): Response {
+export class Http {
+  private source = axios.CancelToken.source();
+  constructor(private crawler: Crawler) {}
   /**
-   * jQuery selector
-   * @param selector selector string
+   * Send request
+   * @param url
+   * @param method
+   * @param body
    */
-  let select: CheerioStatic;
-  function selector(selector: string) {
-    if (select) {
+  public async request(
+    url: string,
+    method: Method = "GET",
+    body?: Body
+  ): Promise<Response> {
+    const { options, proxy, userAgent, headers, auth } = this.crawler;
+    const { retry, timeout } = options;
+
+    // resolve all agent.
+    const [_proxy, _userAgent, _headers, _auth] = await Promise.all([
+      proxy ? await proxy.resolve(url, method, body) : undefined,
+      userAgent ? await userAgent.resolve(url, method, body) : undefined,
+      headers ? await headers.resolve(url, method, body) : {},
+      auth ? await auth.resolve(url, method, body) : undefined
+    ]);
+
+    const config = {
+      url,
+      method,
+      proxy: _proxy,
+      timeout,
+      data: body,
+      auth: _auth,
+      headers: {
+        ..._headers,
+        ...(_userAgent ? { "User-Agent": _userAgent } : {})
+      },
+      cancelToken: this.source.token
+    };
+
+    const run = async () => {
+      const t1 = performance.now();
+      const res = await pTimeout(axios.request(config), config.timeout);
+      const t2 = performance.now();
+
+      const response = this.createResponse(res);
+      response.times = t2 - t1;
+
+      return response;
+    };
+    return pRetry(run, {
+      retries: retry,
+      onFailedAttempt: error => {
+        logger.error(
+          `Attempt [${config.method}]: '${config.url}' ${
+            error.attemptNumber
+          } failed. There are ${error.retriesLeft} retries left.`
+        );
+      }
+    });
+  }
+  /**
+   * Cancel all request
+   */
+  public cancel() {
+    this.source.cancel("Operation canceled by the user.");
+  }
+  private createResponse(response: AxiosResponse): Response {
+    /**
+     * jQuery selector
+     * @param selector selector string
+     */
+    let select: CheerioStatic;
+    function selector(selector: string) {
+      if (select) {
+        return select(selector);
+      }
+      select = cheerio.load(response.data);
       return select(selector);
     }
-    select = cheerio.load(response.data);
-    return select(selector);
+
+    // @ts-ignore
+    const $ = Object.assign(selector, response, cheerio) as Response;
+
+    $.crawler = this.crawler;
+
+    $.download = async (
+      url: string,
+      filepath: string,
+      options?: download.DownloadOptions
+    ): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const _proxy = response.config.proxy;
+        const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
+        const _options: download.DownloadOptions = {
+          headers: response.config.headers,
+          proxy,
+          ...(options || {})
+        };
+        // @ts-ignore
+        download(url, undefined, _options)
+          .pipe(fs.createWriteStream(filepath))
+          .once("error", err => {
+            reject(err);
+          })
+          .once("finish", () => {
+            resolve();
+          });
+      });
+    };
+
+    // 跟着跳到下一个链接
+    $.follow = (nextUrl: Url): void => {
+      if (this.crawler.active && nextUrl) {
+        const task =
+          typeof nextUrl === "string"
+            ? new Task(nextUrl)
+            : new Task(nextUrl.url, nextUrl.method, nextUrl.body);
+        this.crawler.scheduler.push(task);
+      }
+    };
+
+    return $;
   }
-
-  // @ts-ignore
-  const $ = Object.assign(selector, response, cheerio) as Response;
-
-  $.download = (
-    url: string,
-    filepath: string,
-    options?: download.DownloadOptions
-  ): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const _proxy = response.config.proxy;
-      const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
-      const _options: download.DownloadOptions = {
-        headers: response.config.headers,
-        proxy,
-        ...(options || {})
-      };
-      // @ts-ignore
-      download(url, undefined, _options)
-        .pipe(fs.createWriteStream(filepath))
-        .once("error", err => {
-          reject(err);
-        })
-        .once("finish", () => {
-          resolve();
-        });
-    });
-  };
-
-  // 跟着跳到下一个链接
-  $.follow = (nextUrl: Url) => {
-    if (crawler.active && nextUrl) {
-      const task =
-        typeof nextUrl === "string"
-          ? new Task(nextUrl)
-          : new Task(nextUrl.url, nextUrl.method, nextUrl.body);
-      scheduler.push(task);
-    }
-  };
-
-  return $;
 }
