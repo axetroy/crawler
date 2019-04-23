@@ -1,27 +1,32 @@
 import { EventEmitter } from "events";
 import { Method, Body } from "./Http";
-import { Persistence } from "./Persistence";
 
 let id = 0;
 
+type TaskType = "request" | "download";
+
 export class Task {
   public id: number;
-  constructor(public url: string, public method?: Method, public body?: Body) {
+  constructor(
+    public type: TaskType,
+    public method: Method,
+    public url: string,
+    public body?: Body
+  ) {
     this.id = ++id;
   }
 }
 
 export interface Options {
   concurrency?: number;
-  persistenceFn?(): Persistence;
 }
 
 type SubscribeFn = (task: Task) => Promise<void>;
 
 export class Scheduler extends EventEmitter {
-  private pendingQueue: Task[] = []; // The pendding queue
-  private runningQueue: Task[] = []; // The running queue
-  private subscriptions: SubscribeFn[] = []; // The subscription
+  public pendingQueue: Task[] = []; // The pendding queue
+  public runningQueue: Task[] = []; // The running queue
+  private subscriptionFn: SubscribeFn = undefined; // The subscription
   constructor(private options: Options = {}) {
     super();
     this.options.concurrency = this.options.concurrency || 1;
@@ -31,10 +36,7 @@ export class Scheduler extends EventEmitter {
    * @param task a task to execute
    */
   private exec(task: Task): Promise<void> {
-    const link = this.subscriptions.reduce((prev, current) => {
-      return prev.then(() => current(task));
-    }, Promise.resolve());
-    return link;
+    return this.subscriptionFn(task);
   }
   /**
    * Is the scheduler busy?
@@ -48,15 +50,6 @@ export class Scheduler extends EventEmitter {
   private get nextable() {
     return this.pendingQueue.length && !this.isBusy;
   }
-  private sync() {
-    const { persistenceFn } = this.options;
-    if (persistenceFn) {
-      const persistence = persistenceFn();
-      if (persistence) {
-        persistence.sync(this.runningQueue.concat(this.pendingQueue));
-      }
-    }
-  }
   /**
    * Go to the next task
    */
@@ -66,8 +59,6 @@ export class Scheduler extends EventEmitter {
     const task = this.pendingQueue.shift();
 
     this.runningQueue.push(task);
-
-    this.sync();
 
     this.exec(task)
       .catch(err => {
@@ -82,7 +73,7 @@ export class Scheduler extends EventEmitter {
         if (!this.pendingQueue.length && !this.runningQueue.length) {
           this.emit("finish");
         }
-        this.sync();
+        this.emit("task.done");
       });
   }
   /**
@@ -97,7 +88,7 @@ export class Scheduler extends EventEmitter {
    * @param fn
    */
   public subscribe(fn: SubscribeFn) {
-    this.subscriptions.push(fn);
+    this.subscriptionFn = fn;
   }
   /**
    * Push a new task to the pool

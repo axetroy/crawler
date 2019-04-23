@@ -1,5 +1,4 @@
 import * as URL from "url";
-import * as fs from "fs-extra";
 import * as path from "path";
 import { Crawler, Provider, Response, buildIn } from "../src/index";
 
@@ -10,12 +9,7 @@ class ChinaZProvider implements Provider {
   urls = [
     "/tupian/rentiyishu.html",
     "/tupian/renwutupian.html",
-    "/tupian/huadetupian.html",
-    "/tupian/bianhuatupian.html",
-    "/tupian/meishi.html",
-    "/tupian/dangaotupian.html",
-    "/tupian/tiankongtupian.html",
-    "/tag_tupian/OuMeiMeiNv.html"
+    "/tupian/huadetupian.html"
   ].map(path => domain + path);
   async parse($: Response) {
     const nextPageUrl = $("a.nextpage")
@@ -35,8 +29,7 @@ class ChinaZProvider implements Provider {
       for (const imageUrl of imagesUrls) {
         const url = URL.parse(imageUrl);
         const filePath = path.join(__dirname, "images", url.pathname);
-        await fs.ensureDir(path.dirname(filePath));
-        await $.download(imageUrl, filePath);
+        $.downloadInQueue(imageUrl, filePath);
       }
     })().catch(err => {
       console.error("Download fail: " + err.message);
@@ -47,11 +40,12 @@ class ChinaZProvider implements Provider {
 }
 
 const spider = new Crawler(ChinaZProvider, {
-  concurrency: 3,
-  timeout: 1000 * 1,
-  retry: 10,
+  concurrency: 20,
+  timeout: 1000 * 5,
+  retry: 3,
   interval: 1000,
-  UserAgent: buildIn.provider.RandomUserAgent
+  UserAgent: buildIn.provider.RandomUserAgent,
+  persistence: true
 });
 
 spider.on("error", (err, task) => {

@@ -8,14 +8,7 @@ import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./Logger";
 import { sleep } from "./utils";
 
-export interface ICrawler {
-  active: boolean;
-  options: Options;
-  start(): void;
-  stop(): void;
-}
-
-export class Crawler extends EventEmitter implements ICrawler {
+export class Crawler extends EventEmitter {
   public active = true;
   public scheduler: Scheduler;
   public provider: Provider;
@@ -41,20 +34,22 @@ export class Crawler extends EventEmitter implements ICrawler {
     this.auth = options.Auth ? new options.Auth(options) : undefined;
     const { concurrency } = this.options;
 
-    const getPersistenceFn = options.persistence
-      ? () => this.persistence
-      : undefined;
-
-    this.scheduler = new Scheduler({
-      concurrency,
-      persistenceFn: getPersistenceFn
-    });
+    this.scheduler = new Scheduler({ concurrency });
 
     /**
      * it can re-run the task with this `this.scheduler.push(task);`
      */
     this.scheduler.on("error", (err, task) => {
+      logger.error(`Running task ${task.url} [${task.type}]: ${err.message}`);
       this.emit("error", err, task);
+    });
+
+    this.scheduler.on("task.done", () => {
+      // if task done. then sync to task file
+      if (this.persistence) {
+        const { runningQueue, pendingQueue } = this.scheduler;
+        this.persistence.sync(runningQueue, pendingQueue);
+      }
     });
 
     /**
@@ -64,20 +59,33 @@ export class Crawler extends EventEmitter implements ICrawler {
       this.emit("finish");
     });
 
+    // handler the task
     this.scheduler.subscribe(async task => {
-      return await this.request(task.url, task.method, task.body);
+      // if not request type. then ignore it.
+      switch (task.type) {
+        case "request":
+          await this.request(task.url, task.method, task.body);
+          break;
+        case "download":
+          // @ts-ignore
+          const { filepath, options } = task.body;
+          await this.http.downloadResource(task.url, filepath, options);
+        default:
+          break;
+      }
     });
 
     this.persistence = options.persistence
       ? new Persistence(this.scheduler)
       : undefined;
   }
-  private async request(
+  public async request(
     url: string,
     method: Method,
     body?: Body
   ): Promise<void> {
     const response = await this.http.request(url, method, body);
+
     // parse response
     const data = await this.provider.parse(response);
     this.emit("data", data);
@@ -101,9 +109,9 @@ export class Crawler extends EventEmitter implements ICrawler {
     }
     for (const url of this.provider.urls) {
       if (typeof url === "string") {
-        this.scheduler.push(new Task(url));
+        this.scheduler.push(new Task("request", "GET", url));
       } else {
-        this.scheduler.push(new Task(url.url, url.method, url.body));
+        this.scheduler.push(new Task("request", url.method, url.url, url.body));
       }
     }
   }

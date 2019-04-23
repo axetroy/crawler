@@ -1,3 +1,4 @@
+import * as path from "path";
 import { Stream } from "stream";
 import { performance } from "perf_hooks";
 import axios, { AxiosResponse } from "axios";
@@ -66,6 +67,17 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
     options?: download.DownloadOptions
   ): Promise<void>;
   /**
+   * Download the resource in queue
+   * @param url The resource url
+   * @param filepath The filepath which is the resource downloaded
+   * @param options
+   */
+  downloadInQueue(
+    url: string,
+    filepath: string,
+    options?: download.DownloadOptions
+  ): void;
+  /**
    * Go to the next url
    * @param Url
    */
@@ -133,6 +145,67 @@ export class Http {
     });
   }
   /**
+   * Append download task to the pool
+   * @param url
+   * @param filepath
+   * @param options
+   */
+  public download(
+    url: string,
+    filepath: string,
+    options?: download.DownloadOptions
+  ): void {
+    // @ts-ignore
+    const task = new Task("download", "GET", url, { filepath, options });
+    this.crawler.scheduler.push(task);
+  }
+  /**
+   * Download resource
+   * @param url
+   * @param filepath
+   * @param options
+   */
+  public async downloadResource(
+    url: string,
+    filepath: string,
+    options?: download.DownloadOptions
+  ): Promise<void> {
+    const { retry, timeout } = this.crawler.options;
+    await fs.ensureDir(path.dirname(filepath));
+
+    function run() {
+      const p = new Promise((resolve, reject) => {
+        const stream = download(url, undefined, options);
+
+        stream.catch(err => {
+          reject(err);
+        });
+
+        stream
+          .pipe(fs.createWriteStream(filepath))
+          .once("error", (err: Error) => {
+            reject(err);
+          })
+          .once("finish", () => {
+            resolve();
+          });
+      }) as Promise<void>;
+
+      return pTimeout(p, timeout);
+    }
+
+    return pRetry(run, {
+      retries: retry,
+      onFailedAttempt: error => {
+        logger.error(
+          `Attempt [download]: '${url}' ${
+            error.attemptNumber
+          } failed. There are ${error.retriesLeft} retries left.`
+        );
+      }
+    });
+  }
+  /**
    * Cancel all request
    */
   public cancel() {
@@ -157,38 +230,44 @@ export class Http {
 
     $.crawler = this.crawler;
 
+    // download resource
+    $.downloadInQueue = (
+      url: string,
+      filepath: string,
+      options?: download.DownloadOptions
+    ): void => {
+      const _proxy = response.config.proxy;
+      const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
+      const _options: download.DownloadOptions = {
+        headers: response.config.headers,
+        proxy,
+        ...(options || {})
+      };
+      this.download(url, filepath, _options);
+    };
+
     $.download = async (
       url: string,
       filepath: string,
       options?: download.DownloadOptions
     ): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        const _proxy = response.config.proxy;
-        const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
-        const _options: download.DownloadOptions = {
-          headers: response.config.headers,
-          proxy,
-          ...(options || {})
-        };
-        // @ts-ignore
-        download(url, undefined, _options)
-          .pipe(fs.createWriteStream(filepath))
-          .once("error", err => {
-            reject(err);
-          })
-          .once("finish", () => {
-            resolve();
-          });
-      });
+      const _proxy = response.config.proxy;
+      const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
+      const _options: download.DownloadOptions = {
+        headers: response.config.headers,
+        proxy,
+        ...(options || {})
+      };
+      this.downloadResource(url, filepath, _options);
     };
 
-    // 跟着跳到下一个链接
+    // follow the url and crawl next url
     $.follow = (nextUrl: Url): void => {
       if (this.crawler.active && nextUrl) {
         const task =
           typeof nextUrl === "string"
-            ? new Task(nextUrl)
-            : new Task(nextUrl.url, nextUrl.method, nextUrl.body);
+            ? new Task("request", "GET", nextUrl)
+            : new Task("request", nextUrl.method, nextUrl.url, nextUrl.body);
         this.crawler.scheduler.push(task);
       }
     };

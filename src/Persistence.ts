@@ -2,6 +2,11 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import { Task, Scheduler } from "./Scheduler";
 
+export interface TasksJsonFile {
+  running: Task[];
+  pendding: Task[];
+}
+
 export class Persistence {
   public CrawlerDirPath = path.join(process.cwd(), ".crawler");
   public TaskFilePath = path.join(this.CrawlerDirPath, "task.json");
@@ -15,15 +20,27 @@ export class Persistence {
    */
   public load(): boolean {
     try {
-      const tasks = fs.readJsonSync(this.TaskFilePath) as Task[];
-      // if task is empty
-      if (!tasks.length) {
+      const { running, pendding } = fs.readJsonSync(
+        this.TaskFilePath
+      ) as TasksJsonFile;
+
+      if (!running || !pendding) {
         return false;
       }
-      const taskIds = tasks.map(v => v.id);
-      this.scheduler.setCurrentId(Math.max(...taskIds));
-      for (const task of tasks) {
-        this.scheduler.push(task);
+
+      if (!running.length && !pendding.length) {
+        return false;
+      }
+
+      if (running && running.length) {
+        for (const task of running) {
+          this.scheduler.push(task);
+        }
+      }
+      if (pendding && pendding.length) {
+        for (const task of pendding) {
+          this.scheduler.push(task);
+        }
       }
       return true;
     } catch {
@@ -34,8 +51,12 @@ export class Persistence {
    * Sync current task to file
    * @param tasks
    */
-  public sync(tasks: Task[]) {
-    fs.writeJsonSync(this.TaskFilePath, tasks, {
+  public sync(runningTasks: Task[], penddingTasks: Task[]) {
+    const json: TasksJsonFile = {
+      running: runningTasks,
+      pendding: penddingTasks
+    };
+    fs.writeJsonSync(this.TaskFilePath, json, {
       spaces: 2,
       replacer: null
     });
