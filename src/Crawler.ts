@@ -7,6 +7,7 @@ import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./Logger";
 import { sleep } from "./utils";
+import { Storage } from "./Storage";
 
 export class Crawler extends EventEmitter {
   public active = true;
@@ -18,6 +19,7 @@ export class Crawler extends EventEmitter {
   public auth: Auth;
   public persistence: Persistence;
   public http: Http;
+  public storage: Storage;
   constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
     // init config
@@ -29,6 +31,8 @@ export class Crawler extends EventEmitter {
     this.userAgent = options.UserAgent
       ? new options.UserAgent(options)
       : undefined;
+    this.storage = options.Storage || undefined;
+
     this.proxy = options.Proxy ? new options.Proxy(options) : undefined;
     this.headers = options.Headers ? new options.Headers(options) : undefined;
     this.auth = options.Auth ? new options.Auth(options) : undefined;
@@ -87,8 +91,13 @@ export class Crawler extends EventEmitter {
     const response = await this.http.request(url, method, body);
 
     // parse response
-    const data = await this.provider.parse(response);
-    this.emit("data", data);
+    const dataList = await this.provider.parse(response);
+
+    if (this.storage) {
+      await this.storage.append(dataList);
+    }
+
+    this.emit("data", dataList);
 
     if (this.options.interval) {
       await sleep(this.options.interval);

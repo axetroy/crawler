@@ -18,5 +18,5 @@ export interface Provider {
    * How to parse the response and extract data
    * @param respone The request response
    */
-  parse(respone: Response): Promise<any>;
+  parse(respone: Response): Promise<any[]>;
 }

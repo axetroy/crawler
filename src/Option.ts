@@ -2,6 +2,7 @@ import { AgentFactory } from "./agent/UserAgent";
 import { ProxyFactory } from "./agent/Proxy";
 import { HeadersFactory } from "./agent/Headers";
 import { AuthFactory } from "./agent/Auth";
+import { Storage } from "./Storage";
 
 export interface Options {
   /**
@@ -44,4 +45,8 @@ export interface Options {
    * The auth provider.
    */
   Auth?: AuthFactory;
+  /**
+   * The storage of data. defined how to storage your data.
+   */
+  Storage?: Storage;
 }
