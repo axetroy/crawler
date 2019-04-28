@@ -1,8 +1,10 @@
-import { Options } from "./Option";
+import { IncomingHttpHeaders } from "http";
+import { AxiosRequestConfig } from "axios";
+import { Crawler } from "./Crawler";
 import { Url, Response } from "./Http";
 
 export interface ProviderFactory {
-  new (options?: Options): Provider;
+  new (ctx: Crawler): Provider;
 }
 
 export interface Provider {
@@ -15,8 +17,16 @@ export interface Provider {
    */
   urls: Url[];
   /**
+   * The default headers for send request.
+   */
+  defaultHeaders?: IncomingHttpHeaders;
+  /**
    * How to parse the response and extract data
    * @param respone The request response
    */
   parse(respone: Response): Promise<any[]>;
+  /**
+   * When before request. You can change the config before send request.
+   */
+  beforeRequest?(config: AxiosRequestConfig): Promise<void>;
 }

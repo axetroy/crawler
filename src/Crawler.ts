@@ -26,7 +26,7 @@ export class Crawler extends EventEmitter {
     options.timeout = options.timeout || 1000 * 60;
     options.retry = options.retry || 0;
 
-    this.provider = new ProviderClass(options);
+    this.provider = new ProviderClass(this);
     this.http = new Http(this);
     this.userAgent = options.UserAgent
       ? new options.UserAgent(options)

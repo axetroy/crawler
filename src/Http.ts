@@ -83,7 +83,7 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
    */
   follow(url: Url): void;
   /**
-   * retry again. There may be duplicate data
+   * retry again. There may be duplicate data.
    */
   retry(): void;
 }
@@ -102,7 +102,7 @@ export class Http {
     method: Method = "GET",
     body?: Body
   ): Promise<Response> {
-    const { options, proxy, userAgent, headers, auth } = this.crawler;
+    const { options, proxy, userAgent, headers, auth, provider } = this.crawler;
     const { retry, timeout } = options;
 
     // resolve all agent.
@@ -121,11 +121,16 @@ export class Http {
       data: body,
       auth: _auth,
       headers: {
+        ...(provider.defaultHeaders || {}),
         ..._headers,
         ...(_userAgent ? { "User-Agent": _userAgent } : {})
       },
       cancelToken: this.source.token
     };
+
+    if (provider.beforeRequest) {
+      await provider.beforeRequest(config);
+    }
 
     const run = async () => {
       const t1 = performance.now();
