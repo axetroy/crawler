@@ -82,6 +82,10 @@ export interface Response extends AxiosResponse, CheerioSelector, CheerioAPI {
    * @param Url
    */
   follow(url: Url): void;
+  /**
+   * retry again. There may be duplicate data
+   */
+  retry(): void;
 }
 
 export class Http {
@@ -175,6 +179,7 @@ export class Http {
 
     function run() {
       const p = new Promise((resolve, reject) => {
+        // @ts-ignore
         const stream = download(url, undefined, options);
 
         stream.catch(err => {
@@ -246,6 +251,7 @@ export class Http {
       this.download(url, filepath, _options);
     };
 
+    // download resource
     $.download = async (
       url: string,
       filepath: string,
@@ -258,7 +264,7 @@ export class Http {
         proxy,
         ...(options || {})
       };
-      this.downloadResource(url, filepath, _options);
+      await this.downloadResource(url, filepath, _options);
     };
 
     // follow the url and crawl next url
@@ -270,6 +276,18 @@ export class Http {
             : new Task("request", nextUrl.method, nextUrl.url, nextUrl.body);
         this.crawler.scheduler.push(task);
       }
+    };
+
+    // retry this request
+    $.retry = () => {
+      const method = (response.config.method as Method) || "GET";
+      const task = new Task(
+        "request",
+        method,
+        response.config.url,
+        response.config.data
+      );
+      this.crawler.scheduler.push(task);
     };
 
     return $;
