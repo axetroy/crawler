@@ -5,7 +5,7 @@ import chalk from "chalk";
 
 const { combine, timestamp, printf } = winston.format;
 
-interface Printer {
+export interface Printer {
   level: string;
   message: string;
   timestamp?: string;
