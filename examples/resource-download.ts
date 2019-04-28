@@ -22,18 +22,14 @@ class ChinaZProvider implements Provider {
 
     const imagesUrls = $(".picblock img")
       .map((i, el) => $(el).attr("src2"))
-      .get();
+      .get() as string[];
 
     // download images
-    (async () => {
-      for (const imageUrl of imagesUrls) {
-        const url = URL.parse(imageUrl);
-        const filePath = path.join(__dirname, "images", url.pathname);
-        $.downloadInQueue(imageUrl, filePath);
-      }
-    })().catch(err => {
-      console.error("Download fail: " + err.message);
-    });
+    for (const imageUrl of imagesUrls) {
+      const url = URL.parse(imageUrl);
+      const filePath = path.join(__dirname, "images", url.pathname);
+      $.downloadInQueue(imageUrl, filePath);
+    }
 
     return imagesUrls;
   }

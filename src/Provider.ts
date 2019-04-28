@@ -26,6 +26,11 @@ export interface Provider {
    */
   parse(respone: Response): Promise<any[]>;
   /**
+   * Before start provider. something we want to do.
+   * eg. connect to database.
+   */
+  beforeStart?(): Promise<void>;
+  /**
    * When before request. You can change the config before send request.
    */
   beforeRequest?(config: AxiosRequestConfig): Promise<void>;

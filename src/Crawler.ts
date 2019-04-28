@@ -106,7 +106,13 @@ export class Crawler extends EventEmitter {
   /**
    * start crawl
    */
-  public start() {
+  public async start() {
+    const { provider } = this;
+
+    if (provider.beforeRequest) {
+      await provider.beforeStart();
+    }
+
     if (this.persistence) {
       const loadSuccess = this.persistence.load();
       if (loadSuccess) {
@@ -127,7 +133,7 @@ export class Crawler extends EventEmitter {
   /**
    * stop crawl
    */
-  public stop() {
+  public async stop() {
     this.active = false;
     if (this.scheduler) {
       this.http.cancel();
