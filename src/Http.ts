@@ -306,7 +306,8 @@ export class Http {
         "request",
         method,
         response.config.url,
-        response.config.data
+        response.config.data,
+        response.config.headers
       );
       this.crawler.scheduler.push(task);
     };
