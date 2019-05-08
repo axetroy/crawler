@@ -39,13 +39,13 @@ export type Body =
   | Stream
   | null;
 
-export type Headers = IncomingHttpHeaders;
+export type HTTPHeaders = IncomingHttpHeaders;
 
 export interface UrlCustomer {
   url: string;
   method?: Method;
   body?: Body;
-  headers?: Headers;
+  headers?: HTTPHeaders;
 }
 
 export type Url = string | UrlCustomer;
@@ -106,7 +106,7 @@ export class Http {
     url: string,
     method: Method = "GET",
     body?: Body,
-    httpHeaders?: Headers
+    httpHeaders?: HTTPHeaders
   ): Promise<Response> {
     const defaultHeaders = { Reference: url };
     const { options, proxy, userAgent, headers, auth, provider } = this.crawler;

@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { Method, Body, Headers } from "./Http";
+import { Method, Body, HTTPHeaders } from "./Http";
 
 let id = 0;
 
@@ -12,7 +12,7 @@ export class Task {
     public method: Method,
     public url: string,
     public body?: Body,
-    public headers?: Headers
+    public headers?: HTTPHeaders
   ) {
     this.id = ++id;
   }

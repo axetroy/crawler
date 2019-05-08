@@ -74,6 +74,12 @@ spider.start();
 
 ### Example
 
+如何运行 demo ?
+
+```bash
+> npx ts-node examples/basic.ts
+```
+
 [这里](https://github.com/axetroy/crawler/tree/master/examples)有相关的例子
 
 - [基本的爬虫](https://github.com/axetroy/crawler/tree/master/examples/basic.ts)
