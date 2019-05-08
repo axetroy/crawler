@@ -110,7 +110,10 @@ export class Crawler extends EventEmitter {
   public async start() {
     const { provider } = this;
 
-    if (provider.beforeRequest) {
+    /**
+     * if `beforeStart()` have set. then apply and change `urls`
+     */
+    if (provider.beforeStart) {
       await provider.beforeStart();
     }
 
@@ -123,6 +126,16 @@ export class Crawler extends EventEmitter {
         return;
       }
     }
+
+    /**
+     * if `beforeStartUrl()` have set. then apply and change `urls`
+     */
+    if (this.provider.beforeStartUrl) {
+      this.provider.urls = await this.provider.beforeStartUrl(
+        this.provider.urls
+      );
+    }
+
     for (const url of this.provider.urls) {
       if (typeof url === "string") {
         this.scheduler.push(new Task("request", "GET", url));
