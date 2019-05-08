@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { Task, Scheduler } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
-import { Http, Method, Body } from "./Http";
+import { Http, Method, Body, Headers as HTTPHeaders } from "./Http";
 import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./Logger";
@@ -68,7 +68,7 @@ export class Crawler extends EventEmitter {
       // if not request type. then ignore it.
       switch (task.type) {
         case "request":
-          await this.request(task.url, task.method, task.body);
+          await this.request(task.url, task.method, task.body, task.headers);
           break;
         case "download":
           // @ts-ignore
@@ -86,9 +86,10 @@ export class Crawler extends EventEmitter {
   public async request(
     url: string,
     method: Method,
-    body?: Body
+    body?: Body,
+    headers?: HTTPHeaders
   ): Promise<void> {
-    const response = await this.http.request(url, method, body);
+    const response = await this.http.request(url, method, body, headers);
 
     // parse response
     const dataList = await this.provider.parse(response);

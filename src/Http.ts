@@ -1,5 +1,6 @@
 import * as path from "path";
 import { Stream } from "stream";
+import { IncomingHttpHeaders } from "http";
 import { performance } from "perf_hooks";
 import axios, { AxiosResponse } from "axios";
 import * as cheerio from "cheerio";
@@ -38,10 +39,13 @@ export type Body =
   | Stream
   | null;
 
+export type Headers = IncomingHttpHeaders;
+
 export interface UrlCustomer {
   url: string;
   method?: Method;
   body?: Body;
+  headers?: Headers;
 }
 
 export type Url = string | UrlCustomer;
@@ -96,12 +100,15 @@ export class Http {
    * @param url
    * @param method
    * @param body
+   * @param httpHeaders
    */
   public async request(
     url: string,
     method: Method = "GET",
-    body?: Body
+    body?: Body,
+    httpHeaders?: Headers
   ): Promise<Response> {
+    const defaultHeaders = { Reference: url };
     const { options, proxy, userAgent, headers, auth, provider } = this.crawler;
     const { retry, timeout } = options;
 
@@ -121,7 +128,9 @@ export class Http {
       data: body,
       auth: _auth,
       headers: {
+        ...defaultHeaders,
         ...(provider.defaultHeaders || {}),
+        ...(httpHeaders || {}),
         ..._headers,
         ...(_userAgent ? { "User-Agent": _userAgent } : {})
       },
@@ -275,10 +284,17 @@ export class Http {
     // follow the url and crawl next url
     $.follow = (nextUrl: Url): void => {
       if (this.crawler.active && nextUrl) {
+        // set default reference when follow the next page
+        const headers = {
+          Reference: response.config.url
+        };
         const task =
           typeof nextUrl === "string"
-            ? new Task("request", "GET", nextUrl)
-            : new Task("request", nextUrl.method, nextUrl.url, nextUrl.body);
+            ? new Task("request", "GET", nextUrl, undefined, headers)
+            : new Task("request", nextUrl.method, nextUrl.url, nextUrl.body, {
+                ...headers,
+                ...(nextUrl.headers || {})
+              });
         this.crawler.scheduler.push(task);
       }
     };
