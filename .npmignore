@@ -2,3 +2,10 @@ tsconfig.json
 .gitignore
 dist/example/*
 src
+.crawler
+yarn.lock
+renovate.json
+.travis.yml
+deps
+docs
+examples
