@@ -193,20 +193,27 @@ export class Http {
 
     function run() {
       const p = new Promise((resolve, reject) => {
+        let error: Error;
         // @ts-ignore
         const stream = download(url, undefined, options);
 
         stream.catch(err => {
+          error = err;
           reject(err);
         });
 
         stream
           .pipe(fs.createWriteStream(filepath))
           .once("error", (err: Error) => {
-            reject(err);
+            if (!error) {
+              error = err;
+              reject(err);
+            }
           })
           .once("finish", () => {
-            resolve();
+            if (!error) {
+              resolve();
+            }
           });
       }) as Promise<void>;
 
@@ -222,6 +229,9 @@ export class Http {
           } failed. There are ${error.retriesLeft} retries left.`
         );
       }
+    }).catch(err => {
+      logger.error(`download ${url} failed: ${err.message}`);
+      return Promise.reject(err);
     });
   }
   /**
@@ -257,8 +267,16 @@ export class Http {
     ): void => {
       const _proxy = response.config.proxy;
       const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
+
+      const pureHeaders = { ...response.config.headers };
+
+      /**
+       * do not use `Accept`
+       */
+      delete pureHeaders["Accept"];
+
       const _options: download.DownloadOptions = {
-        headers: response.config.headers,
+        headers: pureHeaders,
         proxy,
         ...(options || {})
       };
@@ -273,8 +291,16 @@ export class Http {
     ): Promise<void> => {
       const _proxy = response.config.proxy;
       const proxy = _proxy ? _proxy.host + ":" + _proxy.port : undefined;
+
+      const pureHeaders = { ...response.config.headers };
+
+      /**
+       * do not use `Accept`
+       */
+      delete pureHeaders["Accept"];
+
       const _options: download.DownloadOptions = {
-        headers: response.config.headers,
+        headers: pureHeaders,
         proxy,
         ...(options || {})
       };
