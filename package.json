@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/axetroy/crawler#readme",
   "devDependencies": {
-    "@types/axios": "0.14.0",
     "@types/cheerio": "0.22.12",
     "@types/debug": "4.1.4",
     "@types/download": "6.2.4",

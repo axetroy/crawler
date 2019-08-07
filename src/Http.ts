@@ -2,7 +2,7 @@ import * as path from "path";
 import { Stream } from "stream";
 import { IncomingHttpHeaders } from "http";
 import { performance } from "perf_hooks";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse, Method } from "axios";
 import * as cheerio from "cheerio";
 import * as download from "download";
 import pRetry from "p-retry";
@@ -17,16 +17,7 @@ export type JSONObject = { [key: string]: JSONValue };
 export interface JSONArray extends Array<JSONValue> {}
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 
-export type Method =
-  | "GET"
-  | "HEAD"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "CONNECT"
-  | "OPTIONS"
-  | "TRACE"
-  | "PATCH";
+export type Method = Method;
 
 export type Body =
   | string
