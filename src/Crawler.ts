@@ -83,7 +83,7 @@ export class Crawler extends EventEmitter {
       ? new Persistence(this.scheduler)
       : undefined;
   }
-  public async request(
+  private async request(
     url: string,
     method: Method,
     body?: Body,
