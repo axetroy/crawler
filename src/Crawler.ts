@@ -107,7 +107,7 @@ export class Crawler extends EventEmitter {
   /**
    * start crawl
    */
-  public async start() {
+  public async start(): Promise<Crawler> {
     const { provider } = this;
 
     /**
@@ -123,7 +123,7 @@ export class Crawler extends EventEmitter {
         logger.info(
           `Continue to the last spider from '${this.persistence.TaskFilePath}'`
         );
-        return;
+        return this;
       }
     }
 
@@ -143,15 +143,18 @@ export class Crawler extends EventEmitter {
         this.scheduler.push(new Task("request", url.method, url.url, url.body));
       }
     }
+
+    return this;
   }
   /**
    * stop crawl
    */
-  public async stop() {
+  public async stop(): Promise<Crawler> {
     this.active = false;
     if (this.scheduler) {
       this.http.cancel();
       this.scheduler.clear();
     }
+    return this;
   }
 }

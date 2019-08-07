@@ -5,7 +5,5 @@ export * from "./Option";
 export * from "./Provider";
 export * from "./agent";
 
-import * as buildIn from "./build-in";
-
-export { buildIn, Crawler };
+export { Crawler };
 export default Crawler;

@@ -1,10 +1,11 @@
 import * as URL from "url";
 import * as path from "path";
-import { Crawler, Provider, Response, buildIn } from "../src/index";
+import { Crawler, Provider, Response, Options } from "../src/index";
+import * as buildIn from "../src/build-in";
 
 const domain = "http://sc.chinaz.com";
 
-class ChinaZProvider implements Provider {
+class MyProvider implements Provider {
   name = "china-z";
   urls = [
     "/tupian/rentiyishu.html",
@@ -35,21 +36,20 @@ class ChinaZProvider implements Provider {
   }
 }
 
-const spider = new Crawler(ChinaZProvider, {
+const config: Options = {
   concurrency: 20,
   timeout: 1000 * 5,
   retry: 3,
   interval: 1000,
   UserAgent: buildIn.provider.RandomUserAgent,
   persistence: true
-});
+};
 
-spider.on("error", (err, task) => {
-  console.log(`request fail on ${task.url}: ${err.message}`);
-});
-
-spider.on("finish", () => {
-  console.log("finish...");
-});
-
-spider.start();
+new Crawler(MyProvider, config)
+  .on("error", (err, task) => {
+    console.log(`request fail on ${task.url}: ${err.message}`);
+  })
+  .on("finish", () => {
+    console.log("finish...");
+  })
+  .start();

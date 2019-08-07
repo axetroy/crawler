@@ -1,8 +1,9 @@
-import { Crawler, Provider, Response, buildIn } from "../src/index";
+import { Crawler, Provider, Response, Options } from "../src/index";
+import * as buildIn from "../src/build-in";
 
 const domain = "https://www.baidu.com";
 
-class BaiDuProvider implements Provider {
+class MyProvider implements Provider {
   name = "baidu";
   urls = ["chrome", "firefox", "safari"].map(
     keyword => domain + "/s?wd=" + keyword
@@ -21,24 +22,22 @@ class BaiDuProvider implements Provider {
   }
 }
 
-const spider = new Crawler(BaiDuProvider, {
+const config: Options = {
   timeout: 1000 * 1,
   retry: 3,
   UserAgent: buildIn.provider.RandomUserAgent
-});
+};
 
-spider.on("data", (resultList: string[]) => {
-  for (const result of resultList) {
-    console.log(result);
-  }
-});
-
-spider.on("error", (err, task) => {
-  console.log(`request fail on ${task.url}: ${err.message}`);
-});
-
-spider.on("finish", () => {
-  console.log("finish...");
-});
-
-spider.start();
+new Crawler(MyProvider, config)
+  .on("data", (resultList: string[]) => {
+    for (const result of resultList) {
+      console.log(result);
+    }
+  })
+  .on("error", (err, task) => {
+    console.log(`request fail on ${task.url}: ${err.message}`);
+  })
+  .on("finish", () => {
+    console.log("finish...");
+  })
+  .start();

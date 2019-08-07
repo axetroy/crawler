@@ -1,4 +1,4 @@
-import { Crawler, Provider, Response } from "../src/index";
+import { Crawler, Provider, Response, Options } from "../src/index";
 
 const domain = "https://steamcn.com";
 
@@ -7,7 +7,7 @@ interface Article {
   href: string;
 }
 
-class ScrapinghubProvider implements Provider {
+class MyProvider implements Provider {
   name = "steamcn";
   urls = [];
   async beforeStartUrl() {
@@ -31,25 +31,23 @@ class ScrapinghubProvider implements Provider {
   }
 }
 
-const spider = new Crawler(ScrapinghubProvider, {
+const options: Options = {
   timeout: 1000 * 5,
   retry: 3
-});
+};
 
-spider.on("data", (articles: Article[]) => {
-  for (const article of articles) {
-    if (article.title.indexOf("领取") >= 0) {
-      console.log(`${article.title} ---------- ${article.href}`);
+new Crawler(MyProvider, options)
+  .on("data", (articles: Article[]) => {
+    for (const article of articles) {
+      if (article.title.indexOf("领取") >= 0) {
+        console.log(`${article.title} ---------- ${article.href}`);
+      }
     }
-  }
-});
-
-spider.on("error", (err, task) => {
-  console.log(`request fail on ${task.url}: ${err.message}`);
-});
-
-spider.on("finish", () => {
-  process.stdout.write("finish...\n");
-});
-
-spider.start();
+  })
+  .on("error", (err, task) => {
+    console.log(`request fail on ${task.url}: ${err.message}`);
+  })
+  .on("finish", () => {
+    process.stdout.write("finish...\n");
+  })
+  .start();

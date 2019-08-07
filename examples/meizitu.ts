@@ -1,10 +1,11 @@
 import * as URL from "url";
 import * as path from "path";
-import { Crawler, Provider, Response, buildIn } from "../src/index";
+import { Crawler, Provider, Response } from "../src/index";
+import * as buildIn from "../src/build-in";
 
 const domain = "https://www.mzitu.com";
 
-class MeiZiProvider implements Provider {
+class MyProvider implements Provider {
   name = "meizhi";
   urls = [domain];
   async parse($: Response) {
@@ -31,21 +32,15 @@ class MeiZiProvider implements Provider {
   }
 }
 
-const spider = new Crawler(MeiZiProvider, {
+new Crawler(MyProvider, {
   concurrency: 2,
   timeout: 1000 * 5,
   retry: 3,
   interval: 5000,
   UserAgent: buildIn.provider.RandomUserAgent
   // persistence: true
-});
-
-spider.on("error", (err, task) => {
-  console.log(`request fail on ${task.url}: ${err.message}`);
-});
-
-spider.on("finish", () => {
-  console.log("finish...");
-});
-
-spider.start();
+})
+  .on("error", (err, task) => {
+    console.log(`request fail on ${task.url}: ${err.message}`);
+  })
+  .start();

@@ -1,6 +1,6 @@
-import { Application, Provider, Response } from "../src/index";
+import { Application, Provider, Response, Options } from "../src/index";
 
-class ScrapinghubProvider implements Provider {
+class MyProvider implements Provider {
   name = "scrapinghub";
   urls = ["https://blog.scrapinghub.com"];
   async parse($: Response) {
@@ -16,13 +16,13 @@ class ScrapinghubProvider implements Provider {
   }
 }
 
-const spider = new Application(new ScrapinghubProvider(), {
+const config: Options = {
   timeout: 1000 * 5,
   retry: 3
-});
+};
 
-spider.on("data", d => {
-  console.log("data", d);
-});
-
-spider.start();
+new Application(new MyProvider(), config)
+  .on("data", d => {
+    console.log("data", d);
+  })
+  .start();
