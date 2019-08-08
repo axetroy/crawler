@@ -16,7 +16,6 @@ interface ICrawler extends EventEmitter {
 
 export enum Events {
   Data = "data",
-  Finish = "finish",
   Error = "error"
 }
 
@@ -59,19 +58,12 @@ export class Crawler extends EventEmitter implements ICrawler {
       this.emit(Events.Error, err, task);
     });
 
-    this.scheduler.on(SchedulerEvents.TaskDone, () => {
+    this.scheduler.on(SchedulerEvents.Complete, () => {
       // if task done. then sync to task file
       if (this.persistence) {
         const { runningQueue, pendingQueue } = this.scheduler;
         this.persistence.sync(runningQueue, pendingQueue);
       }
-    });
-
-    /**
-     * Where there is no task to do
-     */
-    this.scheduler.on(SchedulerEvents.Finish, () => {
-      this.emit(Events.Finish);
     });
 
     // handler the task

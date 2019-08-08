@@ -6,9 +6,8 @@ let id = 0;
 export type TaskType = "request" | "download";
 
 export enum Events {
-  Finish = "finish",
   Error = "error",
-  TaskDone = "task.done"
+  Complete = "complete"
 }
 
 export class Task {
@@ -34,6 +33,7 @@ interface IScheduler extends EventEmitter {
   subscribe(fn: SubscribeFn): void;
   push(task: Task): void;
   clear(): void;
+  length: number;
 }
 
 export class Scheduler extends EventEmitter implements IScheduler {
@@ -82,11 +82,10 @@ export class Scheduler extends EventEmitter implements IScheduler {
         const currentTaskIndex = this.runningQueue.findIndex(t => t === task);
         this.runningQueue.splice(currentTaskIndex, 1);
 
+        // If there are still pending task, continue processing
         if (this.nextable) this.next();
-        if (!this.pendingQueue.length && !this.runningQueue.length) {
-          this.emit(Events.Finish);
-        }
-        this.emit(Events.TaskDone);
+
+        this.emit(Events.Complete);
       });
   }
   /**
@@ -109,5 +108,11 @@ export class Scheduler extends EventEmitter implements IScheduler {
    */
   public clear() {
     this.pendingQueue.splice(0);
+  }
+  /**
+   * Get the length for this scheduler
+   */
+  public get length() {
+    return this.pendingQueue.length + this.runningQueue.length;
   }
 }

@@ -37,7 +37,4 @@ new Crawler(MyProvider, config)
   .on("error", (err, task) => {
     console.log(`request fail on ${task.url}: ${err.message}`);
   })
-  .on("finish", () => {
-    console.log("finish...");
-  })
   .start();
