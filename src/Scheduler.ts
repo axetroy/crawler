@@ -25,7 +25,7 @@ export interface Options {
 type SubscribeFn = (task: Task) => Promise<void>;
 
 export class Scheduler extends EventEmitter {
-  public pendingQueue: Task[] = []; // The pendding queue
+  public pendingQueue: Task[] = []; // The pending queue
   public runningQueue: Task[] = []; // The running queue
   private subscriptionFn: SubscribeFn = undefined; // The subscription
   constructor(private options: Options = {}) {

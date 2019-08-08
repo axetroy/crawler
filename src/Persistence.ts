@@ -4,7 +4,7 @@ import { Task, Scheduler } from "./Scheduler";
 
 export interface TasksJsonFile {
   running: Task[];
-  pendding: Task[];
+  pending: Task[];
 }
 
 export class Persistence {
@@ -20,15 +20,15 @@ export class Persistence {
    */
   public load(): boolean {
     try {
-      const { running, pendding } = fs.readJsonSync(
+      const { running, pending } = fs.readJsonSync(
         this.TaskFilePath
       ) as TasksJsonFile;
 
-      if (!running || !pendding) {
+      if (!running || !pending) {
         return false;
       }
 
-      if (!running.length && !pendding.length) {
+      if (!running.length && !pending.length) {
         return false;
       }
 
@@ -37,8 +37,8 @@ export class Persistence {
           this.scheduler.push(task);
         }
       }
-      if (pendding && pendding.length) {
-        for (const task of pendding) {
+      if (pending && pending.length) {
+        for (const task of pending) {
           this.scheduler.push(task);
         }
       }
@@ -51,10 +51,10 @@ export class Persistence {
    * Sync current task to file
    * @param tasks
    */
-  public sync(runningTasks: Task[], penddingTasks: Task[]) {
+  public sync(runningTasks: Task[], pendingTasks: Task[]) {
     const json: TasksJsonFile = {
       running: runningTasks,
-      pendding: penddingTasks
+      pending: pendingTasks
     };
     fs.writeJsonSync(this.TaskFilePath, json, {
       spaces: 2,

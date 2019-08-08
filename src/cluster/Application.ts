@@ -12,7 +12,7 @@ const numCPUs = os.cpus().length;
 interface Workspace {
   id: number;
   taskNumber: number;
-  workder: cluster.Worker;
+  worker: cluster.Worker;
 }
 
 function sum(array: number[]) {
@@ -25,16 +25,16 @@ export class Application extends EventEmitter {
   constructor(private provider: Provider, private options: Options) {
     super();
   }
-  private pendding: Task[] = [];
+  private pending: Task[] = [];
   private workspace: Workspace[] = [];
   private allot() {
-    if (!this.pendding.length) {
+    if (!this.pending.length) {
       return;
     }
 
     let task: Task;
 
-    while ((task = this.pendding.shift() && task)) {
+    while ((task = this.pending.shift() && task)) {
       const workspace = this.idleWorkspace;
 
       const msg: Message = {
@@ -42,7 +42,7 @@ export class Application extends EventEmitter {
         payload: task
       };
       workspace.taskNumber++;
-      workspace.workder.send(msg);
+      workspace.worker.send(msg);
     }
   }
   private get idleWorkspace() {
@@ -59,7 +59,7 @@ export class Application extends EventEmitter {
       worker.on("message", (msg: Message) => {
         switch (msg.type) {
           case "task:create":
-            this.pendding.push(msg.payload as Task);
+            this.pending.push(msg.payload as Task);
             this.allot();
             break;
           case "task:done":
@@ -79,7 +79,7 @@ export class Application extends EventEmitter {
       this.workspace.push({
         id: worker.id,
         taskNumber: 0,
-        workder: worker
+        worker: worker
       });
     }
 
@@ -88,7 +88,7 @@ export class Application extends EventEmitter {
         typeof url === "string"
           ? new Task("request", "GET", url)
           : new Task("request", url.method, url.url, url.body);
-      this.pendding.push(task);
+      this.pending.push(task);
     }
 
     this.allot();
