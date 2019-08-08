@@ -9,7 +9,18 @@ import { logger } from "./logger";
 import { sleep } from "./utils";
 import { Storage } from "./storage";
 
-export class Crawler extends EventEmitter {
+interface ICrawler extends EventEmitter {
+  start(): Promise<Crawler>;
+  stop(): Promise<Crawler>;
+}
+
+export enum Events {
+  Data = "data",
+  Finish = "finish",
+  Error = "error"
+}
+
+export class Crawler extends EventEmitter implements ICrawler {
   public active = true;
   public scheduler: Scheduler;
   public provider: Provider;
@@ -17,9 +28,9 @@ export class Crawler extends EventEmitter {
   public proxy: Proxy;
   public headers: Headers;
   public auth: Auth;
-  public persistence: Persistence;
-  public http: Http;
-  public storage: Storage;
+  private readonly http: Http;
+  private readonly storage: Storage;
+  private readonly persistence: Persistence;
   constructor(ProviderClass: ProviderFactory, public options: Options = {}) {
     super();
     // init config
@@ -45,7 +56,7 @@ export class Crawler extends EventEmitter {
      */
     this.scheduler.on("error", (err, task) => {
       logger.error(`Running task ${task.url} [${task.type}]: ${err.message}`);
-      this.emit("error", err, task);
+      this.emit(Events.Error, err, task);
     });
 
     this.scheduler.on("task.done", () => {
@@ -60,7 +71,7 @@ export class Crawler extends EventEmitter {
      * Where there is no task to do
      */
     this.scheduler.on("finish", () => {
-      this.emit("finish");
+      this.emit(Events.Finish);
     });
 
     // handler the task
@@ -74,6 +85,7 @@ export class Crawler extends EventEmitter {
           // @ts-ignore
           const { filepath, options } = task.body;
           await this.http.downloadResource(task.url, filepath, options);
+          break;
         default:
           break;
       }
@@ -98,7 +110,7 @@ export class Crawler extends EventEmitter {
       await this.storage.append(dataList);
     }
 
-    this.emit("data", dataList);
+    this.emit(Events.Data, dataList);
 
     if (this.options.interval) {
       await sleep(this.options.interval);
@@ -123,6 +135,9 @@ export class Crawler extends EventEmitter {
         logger.info(
           `Continue to the last spider from '${this.persistence.TaskFilePath}'`
         );
+
+        this.active = true;
+
         return this;
       }
     }
@@ -144,17 +159,21 @@ export class Crawler extends EventEmitter {
       }
     }
 
+    this.active = true;
+
     return this;
   }
   /**
    * stop crawl
    */
   public async stop(): Promise<Crawler> {
-    this.active = false;
     if (this.scheduler) {
       this.http.cancel();
       this.scheduler.clear();
     }
+
+    this.active = false;
+
     return this;
   }
 }
