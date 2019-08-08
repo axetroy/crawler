@@ -1,1 +1,1 @@
-export * from "./RandomUserAgent";
+export * from "./random-user-agent";

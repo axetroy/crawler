@@ -1,8 +1,8 @@
-export { Application } from "./cluster/Application";
-import { Crawler } from "./Crawler";
+export { Application } from "./cluster/application";
+import { Crawler } from "./crawler";
 export * from "./http";
-export * from "./Option";
-export * from "./Provider";
+export * from "./option";
+export * from "./provider";
 export * from "./agent";
 
 export { Crawler };

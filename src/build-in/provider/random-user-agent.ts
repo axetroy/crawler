@@ -1,4 +1,4 @@
-import { UserAgent } from "../../agent/UserAgent";
+import { UserAgent } from "../../agent/user-agent";
 
 /**
  * Build-in Agent provider.

@@ -1,8 +1,10 @@
-import { AgentFactory } from "./agent/UserAgent";
-import { ProxyFactory } from "./agent/Proxy";
-import { HeadersFactory } from "./agent/Headers";
-import { AuthFactory } from "./agent/Auth";
-import { Storage } from "./Storage";
+import {
+  AgentFactory,
+  ProxyFactory,
+  HeadersFactory,
+  AuthFactory
+} from "./agent";
+import { Storage } from "./storage";
 
 export interface Options {
   /**

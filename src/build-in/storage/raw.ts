@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import { Storage } from "../../Storage";
+import { Storage } from "../../storage";
 
 export interface RawOptions {
   filepath: string; // the json file path

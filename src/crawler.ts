@@ -1,13 +1,13 @@
 import { EventEmitter } from "events";
-import { Task, Scheduler } from "./Scheduler";
-import { Options } from "./Option";
-import { Provider, ProviderFactory } from "./Provider";
+import { Task, Scheduler } from "./scheduler";
+import { Options } from "./option";
+import { Provider, ProviderFactory } from "./provider";
 import { Http, Method, Body, HTTPHeaders } from "./http";
-import { Persistence } from "./Persistence";
+import { Persistence } from "./persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
-import { logger } from "./Logger";
+import { logger } from "./logger";
 import { sleep } from "./utils";
-import { Storage } from "./Storage";
+import { Storage } from "./storage";
 
 export class Crawler extends EventEmitter {
   public active = true;

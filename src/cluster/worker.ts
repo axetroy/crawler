@@ -1,9 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import * as cheerio from "cheerio";
-import { Task } from "../Scheduler";
+import { Task } from "../scheduler";
 import { Message } from "./types";
-import { Provider } from "../Provider";
-import { Options } from "../Option";
+import { Provider } from "../provider";
+import { Options } from "../option";
 import { Url, Method, Response } from "../http";
 
 console.log(`工作进程 ${process.pid} 已启动`);

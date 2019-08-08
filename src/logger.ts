@@ -11,7 +11,7 @@ export interface Printer {
   timestamp?: string;
 }
 
-function createFormater(color?: boolean) {
+function createFormatter(color?: boolean) {
   return printf(({ level, message, timestamp }: Printer) => {
     const time = format(timestamp, "YYYY-MM-DD HH:mm:ss");
     return `${
@@ -28,7 +28,7 @@ const errorLog = path.join(logDirPath, "error.log");
 
 const logger = winston.createLogger({
   levels: winston.config.syslog.levels,
-  format: combine(timestamp(), createFormater()),
+  format: combine(timestamp(), createFormatter()),
   transports: [
     new winston.transports.File({ filename: infoLog, level: "info" }),
     new winston.transports.File({ filename: errorLog, level: "error" })
@@ -39,7 +39,7 @@ const logger = winston.createLogger({
 if (process.env.NODE_ENV !== "production") {
   logger.add(
     new winston.transports.Console({
-      format: createFormater(true)
+      format: createFormatter(true)
     })
   );
 }

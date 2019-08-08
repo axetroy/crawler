@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs-extra";
-import { Task, Scheduler } from "./Scheduler";
+import { Task, Scheduler } from "./scheduler";
 
 export interface TasksJsonFile {
   running: Task[];
@@ -47,9 +47,11 @@ export class Persistence {
       return false;
     }
   }
+
   /**
    * Sync current task to file
-   * @param tasks
+   * @param runningTasks
+   * @param pendingTasks
    */
   public sync(runningTasks: Task[], pendingTasks: Task[]) {
     const json: TasksJsonFile = {

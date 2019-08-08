@@ -1,4 +1,4 @@
-import { Options } from "../Option";
+import { Options } from "../option";
 import { Method, Body } from "../http";
 export interface AgentFactory {
   new (options?: Options): UserAgent;

@@ -1,6 +1,6 @@
 import { IncomingHttpHeaders } from "http";
 import { AxiosRequestConfig } from "axios";
-import { Crawler } from "./Crawler";
+import { Crawler } from "./crawler";
 import { Url, Response } from "./http";
 
 export interface ProviderFactory {

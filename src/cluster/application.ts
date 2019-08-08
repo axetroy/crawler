@@ -2,9 +2,9 @@ import { EventEmitter } from "events";
 import * as cluster from "cluster";
 import * as os from "os";
 
-import { Provider } from "../Provider";
-import { Options } from "../Option";
-import { Task } from "../Scheduler";
+import { Provider } from "../provider";
+import { Options } from "../option";
+import { Task } from "../scheduler";
 import { Message } from "./types";
 
 const numCPUs = os.cpus().length;
@@ -101,7 +101,7 @@ export class Application extends EventEmitter {
     if (cluster.isMaster) {
       this.master();
     } else {
-      const worker = require("./Worker").default;
+      const worker = require("./worker").default;
       worker(this.provider, this.options);
     }
   }

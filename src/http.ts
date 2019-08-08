@@ -8,9 +8,9 @@ import * as download from "download";
 import pRetry from "p-retry";
 import pTimeout from "p-timeout";
 import * as fs from "fs-extra";
-import { Crawler } from "./Crawler";
-import { Task } from "./Scheduler";
-import { logger } from "./Logger";
+import { Crawler } from "./crawler";
+import { Task } from "./scheduler";
+import { logger } from "./logger";
 
 export type JSONPrimitive = string | number | boolean | null;
 export type JSONObject = { [key: string]: JSONValue };
