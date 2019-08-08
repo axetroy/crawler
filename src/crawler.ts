@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { Task, Scheduler } from "./scheduler";
+import { Task, Scheduler, Events as SchedulerEvents } from "./scheduler";
 import { Options } from "./option";
 import { Provider, ProviderFactory } from "./provider";
 import { Http, Method, Body, HTTPHeaders } from "./http";
@@ -54,12 +54,12 @@ export class Crawler extends EventEmitter implements ICrawler {
     /**
      * it can re-run the task with this `this.scheduler.push(task);`
      */
-    this.scheduler.on("error", (err, task) => {
+    this.scheduler.on(SchedulerEvents.Error, (err, task) => {
       logger.error(`Running task ${task.url} [${task.type}]: ${err.message}`);
       this.emit(Events.Error, err, task);
     });
 
-    this.scheduler.on("task.done", () => {
+    this.scheduler.on(SchedulerEvents.TaskDone, () => {
       // if task done. then sync to task file
       if (this.persistence) {
         const { runningQueue, pendingQueue } = this.scheduler;
@@ -70,7 +70,7 @@ export class Crawler extends EventEmitter implements ICrawler {
     /**
      * Where there is no task to do
      */
-    this.scheduler.on("finish", () => {
+    this.scheduler.on(SchedulerEvents.Finish, () => {
       this.emit(Events.Finish);
     });
 

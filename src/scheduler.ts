@@ -3,7 +3,13 @@ import { Method, Body, HTTPHeaders } from "./http";
 
 let id = 0;
 
-type TaskType = "request" | "download";
+export type TaskType = "request" | "download";
+
+export enum Events {
+  Finish = "finish",
+  Error = "error",
+  TaskDone = "task.done"
+}
 
 export class Task {
   public id: number;
@@ -24,9 +30,15 @@ export interface Options {
 
 type SubscribeFn = (task: Task) => Promise<void>;
 
-export class Scheduler extends EventEmitter {
-  public pendingQueue: Task[] = []; // The pending queue
-  public runningQueue: Task[] = []; // The running queue
+interface IScheduler extends EventEmitter {
+  subscribe(fn: SubscribeFn): void;
+  push(task: Task): void;
+  clear(): void;
+}
+
+export class Scheduler extends EventEmitter implements IScheduler {
+  public readonly pendingQueue: Task[] = []; // The pending queue
+  public readonly runningQueue: Task[] = []; // The running queue
   private subscriptionFn: SubscribeFn = undefined; // The subscription
   constructor(private options: Options = {}) {
     super();
@@ -63,7 +75,7 @@ export class Scheduler extends EventEmitter {
 
     this.exec(task)
       .catch(err => {
-        this.emit("error", err, task);
+        this.emit(Events.Error, err, task);
       })
       .finally(() => {
         // remove running task
@@ -72,9 +84,9 @@ export class Scheduler extends EventEmitter {
 
         if (this.nextable) this.next();
         if (!this.pendingQueue.length && !this.runningQueue.length) {
-          this.emit("finish");
+          this.emit(Events.Finish);
         }
-        this.emit("task.done");
+        this.emit(Events.TaskDone);
       });
   }
   /**
@@ -96,6 +108,6 @@ export class Scheduler extends EventEmitter {
    * Clear the pendingQueue
    */
   public clear() {
-    this.pendingQueue = [];
+    this.pendingQueue.splice(0);
   }
 }
