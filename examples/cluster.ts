@@ -1,4 +1,4 @@
-import { Application, Provider, Response, Options } from "../src/index";
+import { Application, Provider, Response, Options } from "../src";
 
 class MyProvider implements Provider {
   name = "scrapinghub";

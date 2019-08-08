@@ -1,4 +1,4 @@
-import { Crawler, Provider, Response, Options } from "../src/index";
+import { Crawler, Provider, Response, Options } from "../src";
 
 const domain = "https://steamcn.com";
 

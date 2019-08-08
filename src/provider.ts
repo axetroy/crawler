@@ -22,9 +22,9 @@ export interface Provider {
   defaultHeaders?: IncomingHttpHeaders;
   /**
    * How to parse the response and extract data
-   * @param respone The request response
+   * @param response The request response
    */
-  parse(respone: Response): Promise<any[]>;
+  parse(response: Response): Promise<any[]>;
   /**
    * Before start crawl the starts up. we can return a new start urls.
    * You can change `urls` in this function.

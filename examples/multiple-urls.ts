@@ -1,4 +1,4 @@
-import { Crawler, Provider, Response, Options } from "../src/index";
+import { Crawler, Provider, Response, Options } from "../src";
 import * as buildIn from "../src/build-in";
 
 const domain = "https://www.baidu.com";

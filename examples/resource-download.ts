@@ -1,6 +1,6 @@
 import * as URL from "url";
 import * as path from "path";
-import { Crawler, Provider, Response, Options } from "../src/index";
+import { Crawler, Provider, Response, Options } from "../src";
 import * as buildIn from "../src/build-in";
 
 const domain = "http://sc.chinaz.com";
