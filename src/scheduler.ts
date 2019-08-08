@@ -78,13 +78,6 @@ export class Scheduler extends EventEmitter {
       });
   }
   /**
-   * Set current id for the task
-   * @param initializationId
-   */
-  public setCurrentId(initializationId: number) {
-    id = initializationId || 0;
-  }
-  /**
    * Subscribe the task
    * @param fn
    */
