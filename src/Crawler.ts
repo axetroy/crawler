@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { Task, Scheduler } from "./Scheduler";
 import { Options } from "./Option";
 import { Provider, ProviderFactory } from "./Provider";
-import { Http, Method, Body, HTTPHeaders } from "./Http";
+import { Http, Method, Body, HTTPHeaders } from "./http";
 import { Persistence } from "./Persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./Logger";

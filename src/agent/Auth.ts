@@ -1,6 +1,6 @@
 import { AxiosBasicCredentials } from "axios";
 import { Options } from "../Option";
-import { Method, Body } from "../Http";
+import { Method, Body } from "../http";
 
 export interface AuthFactory {
   new (options: Options): Auth;

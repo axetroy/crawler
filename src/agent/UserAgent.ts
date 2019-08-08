@@ -1,5 +1,5 @@
 import { Options } from "../Option";
-import { Method, Body } from "../Http";
+import { Method, Body } from "../http";
 export interface AgentFactory {
   new (options?: Options): UserAgent;
 }

@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { Method, Body, HTTPHeaders } from "./Http";
+import { Method, Body, HTTPHeaders } from "./http";
 
 let id = 0;
 

@@ -4,7 +4,7 @@ import { Task } from "../Scheduler";
 import { Message } from "./types";
 import { Provider } from "../Provider";
 import { Options } from "../Option";
-import { Url, Method, Response } from "../Http";
+import { Url, Method, Response } from "../http";
 
 console.log(`工作进程 ${process.pid} 已启动`);
 
