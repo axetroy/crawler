@@ -1,6 +1,6 @@
-workflow "Test Build" {
-  on = "push"
+workflow "Build project" {
   resolves = ["Build"]
+  on = "push"
 }
 
 action "Install Dependencies" {
