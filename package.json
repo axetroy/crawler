@@ -25,7 +25,7 @@
     "@types/debug": "4.1.5",
     "@types/download": "6.2.4",
     "@types/fs-extra": "8.0.0",
-    "@types/node": "11.13.19",
+    "@types/node": "11.13.20",
     "rimraf": "3.0.0",
     "ts-node": "8.3.0",
     "typescript": "3.6.2"
