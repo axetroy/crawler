@@ -24,11 +24,11 @@
     "@types/cheerio": "0.22.13",
     "@types/debug": "4.1.5",
     "@types/download": "6.2.4",
-    "@types/fs-extra": "8.0.0",
-    "@types/node": "11.13.19",
-    "rimraf": "2.6.3",
-    "ts-node": "8.3.0",
-    "typescript": "3.5.3"
+    "@types/fs-extra": "8.0.1",
+    "@types/node": "11.13.22",
+    "rimraf": "3.0.0",
+    "ts-node": "8.4.1",
+    "typescript": "3.6.4"
   },
   "dependencies": {
     "ava": "^2.2.0",
