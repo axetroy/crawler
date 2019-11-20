@@ -17,7 +17,7 @@ export type JSONObject = { [key: string]: JSONValue };
 export interface JSONArray extends Array<JSONValue> {}
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 
-export type Method = Method;
+export { Method };
 
 export type Body =
   | string
@@ -146,9 +146,7 @@ export class Http {
       retries: retry,
       onFailedAttempt: error => {
         logger.error(
-          `Attempt [${config.method}]: '${config.url}' ${
-            error.attemptNumber
-          } failed. There are ${error.retriesLeft} retries left.`
+          `Attempt [${config.method}]: '${config.url}' ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left.`
         );
       }
     });
@@ -215,9 +213,7 @@ export class Http {
       retries: retry,
       onFailedAttempt: error => {
         logger.error(
-          `Attempt [download]: '${url}' ${
-            error.attemptNumber
-          } failed. There are ${error.retriesLeft} retries left.`
+          `Attempt [download]: '${url}' ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left.`
         );
       }
     }).catch(err => {
