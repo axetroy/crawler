@@ -28,7 +28,7 @@
     "@types/node": "12.12.14",
     "rimraf": "3.0.0",
     "ts-node": "8.5.4",
-    "typescript": "3.7.2"
+    "typescript": "3.7.3"
   },
   "dependencies": {
     "ava": "^2.4.0",
