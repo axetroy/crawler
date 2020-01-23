@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { Task, Scheduler, Events as SchedulerEvents } from "./scheduler";
 import { Options } from "./option";
 import { Provider, ProviderFactory } from "./provider";
-import { Http, Method, Body, HTTPHeaders } from "./http";
+import { Http, Method, Body, HTTPHeaders, DownloadBody } from "./http";
 import { Persistence } from "./persistence";
 import { UserAgent, Proxy, Headers, Auth } from "./agent";
 import { logger } from "./logger";
@@ -74,8 +74,7 @@ export class Crawler extends EventEmitter implements ICrawler {
           await this.request(task.url, task.method, task.body, task.headers);
           break;
         case "download":
-          // @ts-ignore
-          const { filepath, options } = task.body;
+          const { filepath, options } = task.body as DownloadBody;
           await this.http.downloadResource(task.url, filepath, options);
           break;
         default:

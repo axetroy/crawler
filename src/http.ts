@@ -2,12 +2,14 @@ import * as path from "path";
 import { Stream } from "stream";
 import { IncomingHttpHeaders } from "http";
 import { performance } from "perf_hooks";
+
 import axios, { AxiosResponse, Method } from "axios";
 import * as cheerio from "cheerio";
-import * as download from "download";
+import download from "download";
 import pRetry from "p-retry";
 import pTimeout from "p-timeout";
 import * as fs from "fs-extra";
+
 import { Crawler } from "./crawler";
 import { Task } from "./scheduler";
 import { logger } from "./logger";
@@ -19,9 +21,15 @@ export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 
 export { Method };
 
+export interface DownloadBody {
+  filepath: string;
+  options: download.DownloadOptions;
+}
+
 export type Body =
   | string
   | JSONValue
+  | DownloadBody
   | Buffer
   | ArrayBuffer
   | ArrayBufferView
@@ -162,7 +170,6 @@ export class Http {
     filepath: string,
     options?: download.DownloadOptions
   ): void {
-    // @ts-ignore
     const task = new Task("download", "GET", url, { filepath, options });
     this.crawler.scheduler.push(task);
   }
@@ -183,7 +190,6 @@ export class Http {
     function run() {
       const p = new Promise((resolve, reject) => {
         let error: Error;
-        // @ts-ignore
         const stream = download(url, undefined, options);
 
         stream.catch(err => {
@@ -241,8 +247,7 @@ export class Http {
       return select(selector);
     }
 
-    // @ts-ignore
-    const $ = Object.assign(selector, response, cheerio) as Response;
+    const $ = Object.assign(selector, response, cheerio) as unknown as Response;
 
     $.crawler = this.crawler;
 
