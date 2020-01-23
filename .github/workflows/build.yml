@@ -53,6 +53,7 @@ jobs:
       - name: Build
         run: |
           yarn run build
+          yarn run generate:docs
 
       - name: Deploy document
         uses: maxheld83/ghpages@v0.2.1
