@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/axetroy/crawler.svg?branch=master)](https://travis-ci.com/axetroy/crawler)
+[![Build Status](https://github.com/axetroy/crawler/workflows/build/badge.svg)](https://github.com/axetroy/crawler/actions)
 [![DeepScan grade](https://deepscan.io/api/teams/5773/projects/7590/branches/79790/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5773&pid=7590&bid=79790)
 [![npm version](https://badge.fury.io/js/%40axetroy%2Fcrawler.svg)](https://badge.fury.io/js/%40axetroy%2Fcrawler)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
