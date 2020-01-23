@@ -30,7 +30,7 @@
     "typescript": "3.7.5"
   },
   "dependencies": {
-    "ava": "^2.4.0",
+    "ava": "^3.0.0",
     "axios": "^0.19.0",
     "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
