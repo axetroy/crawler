@@ -6,7 +6,7 @@
 
 ### Nodejs 的爬虫框架
 
-一个快速，简单，易用的 nodejs 爬虫框架.
+一个快速，简单，易用的 node.js 爬虫框架.
 
 > WARNING: 当前仍处于开发阶段，任何存在的特性都可能会更改或者移除
 
@@ -70,7 +70,7 @@ new Crawler(MyProvider, config)
 
 ### Example
 
-如何运行 demo ?
+如何运行 demo?
 
 ```bash
 > npx ts-node examples/basic.ts
