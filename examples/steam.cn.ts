@@ -1,6 +1,6 @@
 import { Crawler, Provider, Response, Options } from "../src";
 
-const domain = "https://steamcn.com";
+const domain = "https://keylol.com";
 
 interface Article {
   title: string;
@@ -8,10 +8,10 @@ interface Article {
 }
 
 class MyProvider implements Provider {
-  name = "steamcn";
+  name = "keylol.com";
   urls = [];
   async beforeStartUrl() {
-    return new Array(5).fill(0).map((_, index) => {
+    return new Array(100).fill(0).map((_, index) => {
       return domain + "/f319-" + index;
     });
   }

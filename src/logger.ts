@@ -13,7 +13,7 @@ export interface Printer {
 
 function createFormatter(color?: boolean) {
   return printf(({ level, message, timestamp }: Printer) => {
-    const time = format(new Date(timestamp), "YYYY-MM-DD HH:mm:ss");
+    const time = format(new Date(timestamp), "yyyy-MM-dd HH:mm:ss");
     return `${
       color ? chalk.green(time) : time
     } ${level.toUpperCase()}: ${message}`;
