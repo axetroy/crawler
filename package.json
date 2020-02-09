@@ -25,7 +25,7 @@
     "@types/download": "6.2.4",
     "@types/fs-extra": "8.0.1",
     "@types/node": "12.12.26",
-    "rimraf": "3.0.1",
+    "rimraf": "3.0.2",
     "ts-node": "8.6.2",
     "typescript": "3.7.5"
   },
