@@ -12,10 +12,6 @@ export interface Options {
    */
   concurrency?: number;
   /**
-   * Run in headless mode. Default: `false`.
-   */
-  headless?: boolean;
-  /**
    * The interval between after request done. let it take a rest. Default: `0`.
    */
   interval?: number;
