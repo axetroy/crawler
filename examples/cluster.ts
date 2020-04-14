@@ -1,4 +1,4 @@
-import { Application, Provider, Response, Options } from "../src";
+import { Crawler, Provider, Response, Options } from "../src";
 
 class MyProvider implements Provider {
   name = "scrapinghub";
@@ -21,7 +21,7 @@ const config: Options = {
   retry: 3
 };
 
-new Application(new MyProvider(), config)
+new Crawler(MyProvider, config)
   .on("data", d => {
     console.log("data", d);
   })
