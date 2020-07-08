@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/axetroy/crawler#readme",
   "devDependencies": {
-    "@types/cheerio": "0.22.20",
+    "@types/cheerio": "0.22.21",
     "@types/debug": "4.1.5",
     "@types/download": "6.2.4",
     "@types/fs-extra": "9.0.1",
